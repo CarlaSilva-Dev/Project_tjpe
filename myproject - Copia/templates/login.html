@@ -1,0 +1,304 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Login - Sistema TJPE
+{% endblock %}
+
+{% block content %}
+
+<div class="login-page">
+
+    <!-- =====================================================
+         CARD LOGIN
+    ====================================================== -->
+
+    <div class="login-card fade-in">
+
+        <!-- =============================================
+             LOGO / HEADER
+        ============================================== -->
+
+        <div class="login-header">
+
+            <div class="mb-3">
+
+                <i class="fa fa-scale-balanced login-icon"></i>
+
+            </div>
+
+            <h2>
+
+                Sistema TJPE
+
+            </h2>
+
+            <p>
+
+                Gestão de Processos de Usucapião
+
+            </p>
+
+        </div>
+
+
+        <!-- =============================================
+             ALERTA ERRO
+        ============================================== -->
+
+        {% if erro %}
+
+            <div
+                class="alert alert-danger text-center"
+            >
+
+                <i class="fa fa-circle-exclamation"></i>
+
+                {{ erro }}
+
+            </div>
+
+        {% endif %}
+
+
+        <!-- =============================================
+             ALERTAS FLASH
+        ============================================== -->
+
+        {% with messages = get_flashed_messages(with_categories=true) %}
+
+            {% if messages %}
+
+                {% for category, message in messages %}
+
+                    <div
+                        class="alert alert-{{ category }}"
+                    >
+
+                        {{ message }}
+
+                    </div>
+
+                {% endfor %}
+
+            {% endif %}
+
+        {% endwith %}
+
+
+        <!-- =============================================
+             FORM LOGIN
+        ============================================== -->
+
+        <form method="POST">
+
+            <!-- EMAIL -->
+
+            <div class="mb-3">
+
+                <label for="email">
+
+                    <i class="fa fa-envelope"></i>
+
+                    Email
+
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">
+
+                        <i class="fa fa-envelope"></i>
+
+                    </span>
+
+                    <input
+                        type="email"
+                        class="form-control"
+                        name="email"
+                        id="email"
+                        placeholder="usuario@tjpe.jus.br"
+                        required
+                        autofocus
+                    >
+
+                </div>
+
+            </div>
+
+
+            <!-- SENHA -->
+
+            <div class="mb-3">
+
+                <label for="senha">
+
+                    <i class="fa fa-lock"></i>
+
+                    Senha
+
+                </label>
+
+                <div class="input-group">
+
+                    <span class="input-group-text">
+
+                        <i class="fa fa-key"></i>
+
+                    </span>
+
+                    <input
+                        type="password"
+                        class="form-control"
+                        name="senha"
+                        id="senha"
+                        placeholder="Digite sua senha"
+                        required
+                    >
+
+                    <!-- MOSTRAR SENHA -->
+
+                    <button
+                        type="button"
+                        class="btn btn-outline-secondary"
+                        id="toggleSenha"
+                    >
+
+                        <i class="fa fa-eye"></i>
+
+                    </button>
+
+                </div>
+
+            </div>
+
+
+            <!-- LEMBRAR -->
+
+            <div
+                class="d-flex justify-content-between align-items-center mb-4"
+            >
+
+                <div class="form-check">
+
+                    <input
+                        class="form-check-input"
+                        type="checkbox"
+                        id="lembrar"
+                    >
+
+                    <label
+                        class="form-check-label"
+                        for="lembrar"
+                    >
+
+                        Lembrar login
+
+                    </label>
+
+                </div>
+
+                <a
+                    href="#"
+                    class="text-decoration-none"
+                >
+
+                    Esqueci minha senha
+
+                </a>
+
+            </div>
+
+
+            <!-- BOTÃO -->
+
+            <button
+                type="submit"
+                class="btn btn-primary w-100 login-btn"
+            >
+
+                <i class="fa fa-right-to-bracket"></i>
+
+                Entrar no Sistema
+
+            </button>
+
+        </form>
+
+
+        <!-- =============================================
+             RODAPÉ LOGIN
+        ============================================== -->
+
+        <div class="login-footer">
+
+            <small>
+
+                Tribunal de Justiça de Pernambuco © 2026
+
+            </small>
+
+        </div>
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     SCRIPT LOGIN
+========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    // =====================================================
+    // MOSTRAR / OCULTAR SENHA
+    // =====================================================
+
+    const toggleSenha =
+        document.getElementById("toggleSenha");
+
+    const senhaInput =
+        document.getElementById("senha");
+
+    toggleSenha.addEventListener("click", function(){
+
+        const tipo =
+            senhaInput.getAttribute("type");
+
+        if(tipo === "password"){
+
+            senhaInput.setAttribute(
+                "type",
+                "text"
+            );
+
+            toggleSenha.innerHTML =
+                '<i class="fa fa-eye-slash"></i>';
+
+        } else {
+
+            senhaInput.setAttribute(
+                "type",
+                "password"
+            );
+
+            toggleSenha.innerHTML =
+                '<i class="fa fa-eye"></i>';
+        }
+
+    });
+
+
+    // =====================================================
+    // AUTOFOCUS EMAIL
+    // =====================================================
+
+    document.getElementById("email").focus();
+
+});
+
+</script>
+
+{% endblock %}

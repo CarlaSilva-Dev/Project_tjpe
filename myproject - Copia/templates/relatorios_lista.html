@@ -1,0 +1,153 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="fade-in">
+
+    <!-- HEADER -->
+    <div class="card-box mb-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+            <div>
+                <h2 class="mb-1">Relatórios</h2>
+                <p class="text-muted">Gerenciar e visualizar relatórios salvos</p>
+            </div>
+
+            <div>
+                <a href="/relatorio/novo" class="btn btn-primary">
+                    <i class="fas fa-plus"></i> Novo Relatório
+                </a>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- ALERTS -->
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <!-- TABELA DE RELATÓRIOS -->
+    <div class="card-box">
+
+        <div class="table-responsive">
+
+            <table class="table table-hover align-middle">
+
+                <thead>
+                    <tr>
+                        <th>Nome</th>
+                        <th>Usuário</th>
+                        <th>Status</th>
+                        <th>Comarca</th>
+                        <th>Tipo</th>
+                        <th>Criado em</th>
+                        <th>Ações</th>
+                    </tr>
+                </thead>
+
+                <tbody>
+
+                    {% if relatorios %}
+
+                        {% for r in relatorios %}
+
+                        <tr>
+
+                            <td>
+                                <strong>{{ r['nome'] }}</strong>
+                                {% if r['descricao'] %}
+                                    <br><small class="text-muted">{{ r['descricao'] }}</small>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <span class="badge badge-info">{{ r['usuario_nome'] }}</span>
+                            </td>
+
+                            <td>
+                                {% if r['status'] %}
+                                    <span class="badge badge-secondary">{{ r['status'] }}</span>
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if r['comarca'] %}
+                                    {{ r['comarca'] }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                {% if r['tipo_usucapiao'] %}
+                                    {{ r['tipo_usucapiao'] }}
+                                {% else %}
+                                    <span class="text-muted">-</span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <small>{{ r['data_criacao'] }}</small>
+                            </td>
+
+                            <td>
+                                <div class="action-buttons">
+
+                                    <a href="/relatorio/visualizar/{{ r['id'] }}" class="btn btn-sm btn-info" title="Visualizar">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+
+                                    {% if session.perfil == 'Administrador' or session.usuario_id == r['usuario_id'] %}
+
+                                        <a href="/relatorio/editar/{{ r['id'] }}" class="btn btn-sm btn-warning" title="Editar">
+                                            <i class="fas fa-edit"></i>
+                                        </a>
+
+                                        <a href="/relatorio/excluir/{{ r['id'] }}" class="btn btn-sm btn-danger" 
+                                           onclick="return confirm('Confirma exclusão?')" title="Excluir">
+                                            <i class="fas fa-trash"></i>
+                                        </a>
+
+                                    {% endif %}
+
+                                </div>
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    {% else %}
+
+                        <tr>
+                            <td colspan="7" class="text-center text-muted py-5">
+                                Nenhum relatório encontrado.
+                                <br><a href="/relatorio/novo" class="btn btn-sm btn-primary mt-2">Criar primeiro</a>
+                            </td>
+                        </tr>
+
+                    {% endif %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+</div>
+
+{% endblock %}

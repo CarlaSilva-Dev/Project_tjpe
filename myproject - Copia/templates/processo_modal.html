@@ -1,0 +1,43 @@
+<div style="padding:18px;">
+
+    <h4 style="margin-top:0;">Processo {{ processo['numero'] }}</h4>
+
+    <div style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:8px;">
+        <div style="flex:1; min-width:180px;">
+            <small class="text-muted">Autor</small>
+            <div>{{ processo['autor'] }}</div>
+        </div>
+        <div style="flex:1; min-width:180px;">
+            <small class="text-muted">Réu</small>
+            <div>{{ processo['reu'] }}</div>
+        </div>
+        <div style="flex:1; min-width:140px;">
+            <small class="text-muted">Comarca</small>
+            <div>{{ processo['comarca'] }}</div>
+        </div>
+    </div>
+
+    <div style="margin-bottom:8px;">
+        <small class="text-muted">Tipo</small>
+        <div>{{ processo['tipo_usucapiao'] }}</div>
+    </div>
+
+    <div style="margin-bottom:8px;">
+        <small class="text-muted">Status</small>
+        <div>{{ processo['status'] }}</div>
+    </div>
+
+    {% if processo['observacoes'] %}
+    <div style="margin-bottom:8px;">
+        <small class="text-muted">Observações</small>
+        <div style="white-space:pre-wrap;">{{ processo['observacoes'] }}</div>
+    </div>
+    {% endif %}
+
+    <div style="display:flex; gap:8px; margin-top:12px;">
+        <a href="/processo/{{ processo['id'] }}" class="btn btn-sm btn-info">Abrir página</a>
+        <a href="/processo/editar/{{ processo['id'] }}" class="btn btn-sm btn-warning">Editar</a>
+        <a href="/processo/pdf/{{ processo['id'] }}" class="btn btn-sm btn-danger" target="_blank">PDF</a>
+    </div>
+
+</div>

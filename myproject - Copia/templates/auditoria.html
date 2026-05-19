@@ -1,0 +1,294 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="fade-in">
+
+    <!-- =====================================================
+         HEADER
+    ====================================================== -->
+
+    <div class="card-box mb-4">
+
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+
+            <div>
+
+                <h2 class="mb-1">
+                    Auditoria do Sistema
+                </h2>
+
+                <p class="text-muted">
+                    Histórico completo das ações realizadas no sistema.
+                </p>
+
+            </div>
+
+            <div>
+
+                <a href="{{ url_for('novo_auditoria') }}" class="btn btn-primary">
+
+                    <i class="fa fa-plus"></i>
+                    Novo
+
+                </a>
+
+                <button
+                    class="btn btn-secondary"
+                    onclick="window.print()"
+                    data-tooltip="Imprimir auditoria"
+                >
+
+                    <i class="fa fa-print"></i>
+                    Imprimir
+
+                </button>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FILTRO
+    ====================================================== -->
+
+    <div class="card-box mb-4">
+
+        <div class="row">
+
+            <div class="col-md-6">
+
+                <input
+                    type="text"
+                    id="filtroTabela"
+                    class="form-control"
+                    placeholder="Pesquisar logs..."
+                >
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         TABELA
+    ====================================================== -->
+
+    <div class="card-box">
+
+        <div class="table-responsive">
+
+            <table
+                class="table table-hover align-middle"
+                id="tabelaAuditoria"
+            >
+
+                <thead>
+
+                    <tr>
+
+                        <th width="20%">
+                            Usuário
+                        </th>
+
+                        <th width="20%">
+                            Ação
+                        </th>
+
+                        <th width="40%">
+                            Detalhes
+                        </th>
+
+                        <th width="15%">
+                            Data/Hora
+                        </th>
+
+                        <th width="5%">
+                            Ações
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for l in logs %}
+
+                    <tr>
+
+                        <!-- =========================
+                             USUÁRIO
+                        ========================== -->
+
+                        <td>
+
+                            <span class="badge badge-info">
+
+                                {{ l['usuario'] }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- =========================
+                             AÇÃO
+                        ========================== -->
+
+                        <td>
+
+                            {% if "Login" in l['acao'] %}
+
+                                <span class="badge badge-success">
+
+                                    {{ l['acao'] }}
+
+                                </span>
+
+                            {% elif "excluído" in l['acao'] %}
+
+                                <span class="badge badge-danger">
+
+                                    {{ l['acao'] }}
+
+                                </span>
+
+                            {% elif "editado" in l['acao'] %}
+
+                                <span class="badge badge-warning">
+
+                                    {{ l['acao'] }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge badge-info">
+
+                                    {{ l['acao'] }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- =========================
+                             DETALHES
+                        ========================== -->
+
+                        <td>
+
+                            {{ l['detalhes'] }}
+
+                        </td>
+
+
+                        <!-- =========================
+                             DATA
+                        ========================== -->
+
+                        <td>
+
+                            {{ l['data_hora'] }}
+
+                        </td>
+
+                        <td>
+
+                            <div class="d-flex gap-2">
+
+                                <a href="{{ url_for('editar_auditoria', id=l['id']) }}" class="btn btn-sm btn-warning">
+
+                                    <i class="fa fa-pen"></i>
+
+                                </a>
+
+                                <a href="{{ url_for('excluir_auditoria', id=l['id']) }}" class="btn btn-sm btn-dark" onclick="return confirm('Confirma exclusão?')">
+
+                                    <i class="fa fa-trash"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div class="footer">
+
+        Sistema TJPE - Auditoria Processual © 2026
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     DATATABLE
+========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function(){
+
+    new DataTable('#tabelaAuditoria', {
+
+        pageLength: 10,
+
+        language: {
+
+            search: "Pesquisar:",
+
+            lengthMenu:
+                "Mostrar _MENU_ registros",
+
+            info:
+                "Mostrando _START_ até _END_ de _TOTAL_ registros",
+
+            paginate: {
+
+                first: "Primeiro",
+
+                last: "Último",
+
+                next: "Próximo",
+
+                previous: "Anterior"
+            },
+
+            zeroRecords:
+                "Nenhum registro encontrado"
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

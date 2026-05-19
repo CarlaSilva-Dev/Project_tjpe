@@ -1,0 +1,657 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Dashboard
+{% endblock %}
+
+{% block page_title %}
+Dashboard Geral
+{% endblock %}
+
+{% block content %}
+
+<div class="container-fluid fade-in">
+
+    <!-- =====================================================
+         KPIs
+    ====================================================== -->
+
+    <div class="dashboard-grid">
+
+        <!-- TOTAL -->
+
+        <div class="card-kpi blue">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h4>
+                        Total de Processos
+                    </h4>
+
+                    <h2>
+                        {{ total }}
+                    </h2>
+
+                </div>
+
+                <div class="kpi-icon">
+
+                    <i class="fa fa-folder"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- EM TRAMITAÇÃO -->
+
+        <div class="card-kpi orange">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h4>
+                        Em Tramitação
+                    </h4>
+
+                    <h2>
+                        {{ andamento }}
+                    </h2>
+
+                </div>
+
+                <div class="kpi-icon">
+
+                    <i class="fa fa-spinner"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- JULGADOS -->
+
+        <div class="card-kpi green">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h4>
+                        Julgados
+                    </h4>
+
+                    <h2>
+                        {{ julgados }}
+                    </h2>
+
+                </div>
+
+                <div class="kpi-icon">
+
+                    <i class="fa fa-check-circle"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- ARQUIVADOS -->
+
+        <div class="card-kpi red">
+
+            <div class="d-flex justify-content-between align-items-center">
+
+                <div>
+
+                    <h4>
+                        Arquivados
+                    </h4>
+
+                    <h2>
+                        {{ arquivados }}
+                    </h2>
+
+                </div>
+
+                <div class="kpi-icon">
+
+                    <i class="fa fa-box-archive"></i>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         GRÁFICOS
+    ====================================================== -->
+
+    <div class="row g-4 mb-4">
+
+        <!-- =============================================
+             PROCESSOS POR COMARCA
+        ============================================== -->
+
+        <div class="col-lg-8">
+
+            <div class="card-box">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+
+                    <h5 class="mb-0">
+
+                        <i class="fa fa-chart-column"></i>
+
+                        Processos por Comarca
+
+                    </h5>
+
+                </div>
+
+                <canvas id="graficoComarca"></canvas>
+
+            </div>
+
+        </div>
+
+
+        <!-- =============================================
+             STATUS
+        ============================================== -->
+
+        <div class="col-lg-4">
+
+            <div class="card-box">
+
+                <div class="d-flex justify-content-between align-items-center mb-4">
+
+                    <h5 class="mb-0">
+
+                        <i class="fa fa-chart-pie"></i>
+
+                        Status Processual
+
+                    </h5>
+
+                </div>
+
+                <canvas id="graficoStatus"></canvas>
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         PROCESSOS RECENTES
+    ====================================================== -->
+
+    <div class="card-box">
+
+        <!-- HEADER -->
+
+        <div class="d-flex justify-content-between align-items-center mb-4 flex-wrap">
+
+            <div>
+
+                <h5 class="mb-1">
+
+                    <i class="fa fa-folder-open"></i>
+
+                    Últimos Processos
+
+                </h5>
+
+                <small class="text-muted">
+
+                    Últimos registros cadastrados no sistema
+
+                </small>
+
+            </div>
+
+            <div class="d-flex gap-2">
+
+                <a
+                    href="{{ url_for('novo_processo') }}"
+                    class="btn-primary"
+                >
+
+                    <i class="fa fa-plus"></i>
+
+                    Novo Processo
+
+                </a>
+
+                <a
+                    href="{{ url_for('processos') }}"
+                    class="btn-secondary"
+                >
+
+                    <i class="fa fa-folder-open"></i>
+
+                    Ver Todos
+
+                </a>
+
+            </div>
+
+        </div>
+
+
+        <!-- TABELA -->
+
+        <div class="table-responsive">
+
+            <table
+                class="table table-hover align-middle"
+                id="tabelaDashboard"
+            >
+
+                <thead>
+
+                    <tr>
+
+                        <th>
+                            Número
+                        </th>
+
+                        <th>
+                            Autor
+                        </th>
+
+                        <th>
+                            Comarca
+                        </th>
+
+                        <th>
+                            Tipo
+                        </th>
+
+                        <th>
+                            Status
+                        </th>
+
+                        <th>
+                            Data
+                        </th>
+
+                        <th width="230">
+                            Ações
+                        </th>
+
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    {% for p in processos %}
+
+                    <tr>
+
+                        <!-- NÚMERO -->
+
+                        <td>
+
+                            <strong>
+
+                                {{ p['numero'] }}
+
+                            </strong>
+
+                        </td>
+
+
+                        <!-- AUTOR -->
+
+                        <td>
+
+                            {{ p['autor'] }}
+
+                        </td>
+
+
+                        <!-- COMARCA -->
+
+                        <td>
+
+                            {{ p['comarca'] }}
+
+                        </td>
+
+
+                        <!-- TIPO -->
+
+                        <td>
+
+                            <span class="badge badge-info">
+
+                                {{ p['tipo_usucapiao'] }}
+
+                            </span>
+
+                        </td>
+
+
+                        <!-- STATUS -->
+
+                        <td>
+
+                            {% if p['status'] == 'Em tramitação' %}
+
+                                <span class="badge badge-warning">
+
+                                    {{ p['status'] }}
+
+                                </span>
+
+                            {% elif p['status'] == 'Julgado' %}
+
+                                <span class="badge badge-success">
+
+                                    {{ p['status'] }}
+
+                                </span>
+
+                            {% else %}
+
+                                <span class="badge badge-danger">
+
+                                    {{ p['status'] }}
+
+                                </span>
+
+                            {% endif %}
+
+                        </td>
+
+
+                        <!-- DATA -->
+
+                        <td>
+
+                            {{ p['data_cadastro'] }}
+
+                        </td>
+
+
+                        <!-- AÇÕES -->
+
+                        <td>
+
+                            <div class="d-flex gap-2 flex-wrap">
+
+                                <!-- DETALHAR -->
+
+                                <a
+                                    href="{{ url_for('detalhe_processo', id=p['id']) }}"
+                                    class="btn btn-info btn-sm"
+                                    data-tooltip="Visualizar"
+                                >
+
+                                    <i class="fa fa-eye"></i>
+
+                                </a>
+
+
+                                <!-- EDITAR -->
+
+                                <a
+                                    href="{{ url_for('editar_processo', id=p['id']) }}"
+                                    class="btn btn-warning btn-sm"
+                                    data-tooltip="Editar"
+                                >
+
+                                    <i class="fa fa-pen"></i>
+
+                                </a>
+
+
+                                <!-- PDF -->
+
+                                <a
+                                    href="{{ url_for('gerar_pdf', id=p['id']) }}"
+                                    class="btn btn-secondary btn-sm"
+                                    data-tooltip="Gerar PDF"
+                                >
+
+                                    <i class="fa fa-file-pdf"></i>
+
+                                </a>
+
+
+                                <!-- EXCLUIR -->
+
+                                <a
+                                    href="{{ url_for('excluir_processo', id=p['id']) }}"
+                                    class="btn btn-danger btn-sm btn-excluir"
+                                    data-tooltip="Excluir"
+                                >
+
+                                    <i class="fa fa-trash"></i>
+
+                                </a>
+
+                            </div>
+
+                        </td>
+
+                    </tr>
+
+                    {% endfor %}
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+
+
+    <!-- =====================================================
+         FOOTER
+    ====================================================== -->
+
+    <div class="footer">
+
+        Sistema TJPE - Gestão de Usucapião © 2026
+
+    </div>
+
+</div>
+
+
+<!-- =========================================================
+     CHARTS
+========================================================= -->
+
+<script>
+
+document.addEventListener("DOMContentLoaded", function () {
+
+    // =====================================================
+    // BAR CHART
+    // =====================================================
+
+    const ctxComarca =
+        document.getElementById('graficoComarca');
+
+    new Chart(ctxComarca, {
+
+        type: 'bar',
+
+        data: {
+
+            labels: {{ labels | tojson }},
+
+            datasets: [{
+
+                label: 'Quantidade',
+
+                data: {{ valores | tojson }},
+
+                backgroundColor: [
+
+                    '#1e3c72',
+                    '#3498db',
+                    '#2ecc71',
+                    '#f39c12',
+                    '#e74c3c',
+                    '#9b59b6'
+
+                ],
+
+                borderRadius: 8,
+
+                borderWidth: 1
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            plugins: {
+
+                legend: {
+
+                    display: false
+
+                }
+
+            },
+
+            scales: {
+
+                y: {
+
+                    beginAtZero: true
+
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // =====================================================
+    // DOUGHNUT CHART
+    // =====================================================
+
+    const ctxStatus =
+        document.getElementById('graficoStatus');
+
+    new Chart(ctxStatus, {
+
+        type: 'doughnut',
+
+        data: {
+
+            labels: [
+
+                'Em tramitação',
+                'Julgado',
+                'Arquivado'
+
+            ],
+
+            datasets: [{
+
+                data: [
+
+                    {{ andamento }},
+                    {{ julgados }},
+                    {{ arquivados }}
+
+                ],
+
+                backgroundColor: [
+
+                    '#f39c12',
+                    '#2ecc71',
+                    '#e74c3c'
+
+                ],
+
+                borderWidth: 0
+
+            }]
+
+        },
+
+        options: {
+
+            responsive: true,
+
+            plugins: {
+
+                legend: {
+
+                    position: 'bottom'
+
+                }
+
+            }
+
+        }
+
+    });
+
+
+    // =====================================================
+    // DATATABLE
+    // =====================================================
+
+    new DataTable('#tabelaDashboard', {
+
+        pageLength: 5,
+
+        ordering: false,
+
+        searching: false,
+
+        info: false,
+
+        lengthChange: false,
+
+        language: {
+
+            paginate: {
+
+                next: "Próximo",
+
+                previous: "Anterior"
+
+            }
+
+        }
+
+    });
+
+});
+
+</script>
+
+{% endblock %}

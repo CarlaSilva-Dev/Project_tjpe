@@ -1,0 +1,48 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="fade-in">
+
+    <div class="card-box mb-4">
+
+        <h2 class="mb-1">Registrar / Editar Auditoria</h2>
+
+    </div>
+
+    <div class="card-box">
+
+        <form method="post">
+
+            <div class="mb-3">
+                <label class="form-label">Usuário</label>
+                <input type="text" name="usuario" class="form-control" value="{{ log.usuario if log else session.usuario_nome }}">
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Ação</label>
+                <input type="text" name="acao" class="form-control" value="{{ log.acao if log else '' }}" required>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Detalhes</label>
+                <textarea name="detalhes" class="form-control" rows="4">{{ log.detalhes if log else '' }}</textarea>
+            </div>
+
+            <div class="mb-3">
+                <label class="form-label">Data/Hora</label>
+                <input type="text" name="data_hora" class="form-control" value="{{ log.data_hora if log else '' }}">
+            </div>
+
+            <div>
+                <button class="btn-primary">Salvar</button>
+                <a href="/auditoria" class="btn-secondary">Cancelar</a>
+            </div>
+
+        </form>
+
+    </div>
+
+</div>
+
+{% endblock %}

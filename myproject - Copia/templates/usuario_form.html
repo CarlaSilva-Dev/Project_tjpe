@@ -1,0 +1,172 @@
+{% extends 'base.html' %}
+
+{% block title %}
+    {% if usuario %}
+        Editar Usuário
+    {% else %}
+        Novo Usuário
+    {% endif %}
+    - Sistema TJ
+{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2>
+            <i class="fas fa-user-plus"></i>
+
+            {% if usuario %}
+                Editar Usuário
+            {% else %}
+                Novo Usuário
+            {% endif %}
+        </h2>
+
+        <p class="text-muted">
+            {% if usuario %}
+                Atualize os dados do usuário
+            {% else %}
+                Cadastre um novo usuário no sistema
+            {% endif %}
+        </p>
+
+    </div>
+
+    <a href="{{ url_for('usuarios') }}" class="btn btn-secondary">
+        <i class="fas fa-arrow-left"></i>
+        Voltar
+    </a>
+
+</div>
+
+<div class="card-box">
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+        {% if messages %}
+            {% for category, message in messages %}
+
+                <div class="alert alert-{{ category }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+                </div>
+
+            {% endfor %}
+        {% endif %}
+    {% endwith %}
+
+    <form method="POST" id="formUsuario">
+
+        <div class="row g-4">
+
+            <div class="col-lg-6">
+                <label class="form-label">Nome</label>
+                <input type="text" name="nome" class="form-control" required
+                       value="{{ usuario['nome'] if usuario else '' }}">
+            </div>
+
+            <div class="col-lg-6">
+                <label class="form-label">E-mail</label>
+                <input type="email" name="email" id="email" class="form-control" required
+                       value="{{ usuario['email'] if usuario else '' }}">
+                <small id="emailError" class="text-danger d-none">E-mail inválido.</small>
+            </div>
+
+            <!-- CPF removido do backend (não existe no banco atual) -->
+            <div class="col-lg-4">
+                <label class="form-label">Perfil</label>
+                <select name="perfil" class="form-select" required>
+
+                    <option value="">Selecione</option>
+
+                    <option value="Administrador"
+                        {% if usuario and usuario['perfil'] == 'Administrador' %}selected{% endif %}>
+                        Administrador
+                    </option>
+
+                    <option value="Servidor"
+                        {% if usuario and usuario['perfil'] == 'Servidor' %}selected{% endif %}>
+                        Servidor
+                    </option>
+
+                    <option value="Magistrado"
+                        {% if usuario and usuario['perfil'] == 'Magistrado' %}selected{% endif %}>
+                        Magistrado
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="col-lg-4">
+                <label class="form-label">Senha</label>
+                <input type="password" name="senha" id="senha"
+                       class="form-control"
+                       {% if not usuario %}required{% endif %}>
+                <small id="senhaError" class="text-danger d-none">
+                    Mínimo 6 caracteres.
+                </small>
+            </div>
+
+            <div class="col-lg-4">
+                <label class="form-label">Confirmar Senha</label>
+                <input type="password" id="confirmarSenha" class="form-control"
+                       {% if not usuario %}required{% endif %}>
+                <small id="confirmarError" class="text-danger d-none">
+                    Senhas não coincidem.
+                </small>
+            </div>
+
+        </div>
+
+        <hr class="my-4">
+
+        <div class="d-flex justify-content-end gap-3">
+
+            <a href="{{ url_for('usuarios') }}" class="btn btn-secondary">
+                Cancelar
+            </a>
+
+            <button type="submit" class="btn btn-primary">
+                {% if usuario %}Atualizar{% else %}Salvar{% endif %}
+            </button>
+
+        </div>
+
+    </form>
+
+</div>
+
+<script>
+
+document.getElementById('formUsuario').addEventListener('submit', function(e) {
+
+    const email = document.getElementById('email');
+    const senha = document.getElementById('senha');
+    const confirmar = document.getElementById('confirmarSenha');
+
+    let ok = true;
+
+    if (!email.value.includes('@')) {
+        document.getElementById('emailError').classList.remove('d-none');
+        ok = false;
+    }
+
+    if (senha.value.length < 6) {
+        document.getElementById('senhaError').classList.remove('d-none');
+        ok = false;
+    }
+
+    if (senha.value !== confirmar.value) {
+        document.getElementById('confirmarError').classList.remove('d-none');
+        ok = false;
+    }
+
+    if (!ok) e.preventDefault();
+
+});
+
+</script>
+
+{% endblock %}

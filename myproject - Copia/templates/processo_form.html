@@ -1,0 +1,97 @@
+{% extends 'base.html' %}
+
+{% block title %}
+{% if processo %}Editar Processo{% else %}Novo Processo{% endif %} - Sistema TJPE
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid fade-in">
+
+    <div class="card-box mb-4">
+        <div class="d-flex justify-content-between align-items-center flex-wrap">
+            <div>
+                <h2 class="mb-1"><i class="fa fa-folder-plus"></i>
+                    {% if processo %}Editar Processo{% else %}Novo Processo{% endif %}
+                </h2>
+                <small class="text-muted">
+                    {% if processo %}Atualização de processo judicial{% else %}Cadastro de processo de usucapião{% endif %}
+                </small>
+            </div>
+            <a href="{{ url_for('processos') }}" class="btn btn-secondary">
+                <i class="fa fa-arrow-left"></i> Voltar
+            </a>
+        </div>
+    </div>
+
+    <div class="card-box">
+        <form method="POST" id="formProcesso">
+            <div class="row g-4">
+
+                <!-- NÚMERO -->
+                <div class="col-lg-6">
+                    <label class="form-label">Número do Processo</label>
+                    <input type="text" name="numero" class="form-control" required value="{{ processo['numero'] if processo else '' }}">
+                </div>
+
+                <!-- AUTOR -->
+                <div class="col-lg-6">
+                    <label class="form-label">Autor</label>
+                    <input type="text" name="autor" class="form-control" required value="{{ processo['autor'] if processo else '' }}">
+                </div>
+
+                <!-- RÉU -->
+                <div class="col-lg-6">
+                    <label class="form-label">Réu</label>
+                    <input type="text" name="reu" class="form-control" required value="{{ processo['reu'] if processo else '' }}">
+                </div>
+
+                <!-- COMARCA -->
+                <div class="col-lg-6">
+                    <label class="form-label">Comarca</label>
+                    <select name="comarca" class="form-select" required>
+                        <option value="">Selecione</option>
+                        {% for c in comarcas %}
+                            <option value="{{ c['nome'] }}" {% if processo and processo['comarca']==c['nome'] %}selected{% endif %}>{{ c['nome'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- TIPO USUCAPIÃO -->
+                <div class="col-lg-6">
+                    <label class="form-label">Tipo de Usucapião</label>
+                    <select name="tipo_usucapiao" class="form-select" required>
+                        <option value="">Selecione</option>
+                        {% for t in tipos %}
+                            <option value="{{ t['nome'] }}" {% if processo and processo['tipo_usucapiao']==t['nome'] %}selected{% endif %}>{{ t['nome'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- STATUS -->
+                <div class="col-lg-6">
+                    <label class="form-label">Status</label>
+                    <select name="status" class="form-select" required>
+                        <option value="">Selecione</option>
+                        {% for s in status_lista %}
+                            <option value="{{ s['nome'] }}" {% if processo and processo['status']==s['nome'] %}selected{% endif %}>{{ s['nome'] }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+
+                <!-- OBSERVAÇÕES -->
+                <div class="col-lg-12">
+                    <label class="form-label">Observações</label>
+                    <textarea name="observacoes" class="form-control" rows="5">{{ processo['observacoes'] if processo else '' }}</textarea>
+                </div>
+
+            </div>
+
+            <div class="d-flex justify-content-end gap-2 mt-4">
+                <a href="{{ url_for('processos') }}" class="btn btn-secondary">Cancelar</a>
+                <button type="submit" class="btn btn-primary">{% if processo %}Atualizar{% else %}Salvar{% endif %}</button>
+            </div>
+        </form>
+    </div>
+
+</div>
+{% endblock %}

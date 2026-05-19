@@ -1,0 +1,567 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<div class="fade-in">
+
+    <!-- HEADER HERO -->
+    <div style="background: linear-gradient(135deg, #1e3c72 0%, #2a5298 100%); color: white; padding: 28px; border-radius: 12px; margin-bottom: 24px;">
+
+        <div class="d-flex justify-content-between align-items-start flex-wrap" style="gap: 16px;">
+
+            <div style="flex: 1;">
+
+                <h1 style="font-size: 28px; font-weight: 700; margin-bottom: 4px; display: flex; align-items: center; gap: 12px;">
+                    <i class="fas fa-chart-bar"></i> {{ relatorio.nome }}
+                </h1>
+
+                {% if relatorio.descricao %}
+                    <p style="opacity: 0.9; margin: 8px 0 0 0; font-size: 14px;">{{ relatorio.descricao }}</p>
+                {% endif %}
+
+                <div style="margin-top: 12px; font-size: 13px; opacity: 0.85;">
+                    <i class="fas fa-user"></i> Criado por <strong>{{ relatorio.usuario_nome }}</strong> |
+                    <i class="fas fa-calendar"></i> {{ relatorio.data_criacao }} | 
+                    <i class="fas fa-sync"></i> Atualizado: {{ relatorio.data_atualizacao }}
+                </div>
+
+            </div>
+
+            <div style="display: flex; gap: 8px; flex-wrap: wrap; justify-content: flex-end;">
+                <a href="/relatorios" class="btn btn-outline-secondary" style="border-color: white; color: white;">
+                    <i class="fas fa-arrow-left"></i> Voltar
+                </a>
+                <a href="/relatorio/editar/{{ relatorio.id }}" class="btn btn-warning">
+                    <i class="fas fa-edit"></i> Editar
+                </a>
+                <button class="btn" style="background: white; color: #1e3c72;" onclick="window.print()">
+                    <i class="fas fa-print"></i> Imprimir
+                </button>
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- CRITÉRIOS DO RELATÓRIO -->
+    <div class="card-box mb-4">
+
+        <h4 class="mb-3" style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-filter" style="color: #1e3c72;"></i> Filtros Aplicados
+        </h4>
+
+        <div class="row g-3">
+
+            <div class="col-lg-3 col-md-6">
+                <div style="background: #dbeafe; padding: 14px; border-radius: 8px; border-left: 4px solid #3498db;">
+                    <small style="color: #1d4ed8; font-weight: 600;">STATUS</small>
+                    <div style="margin-top: 6px; font-size: 15px; font-weight: 500;">
+                        {% if relatorio.status %}
+                            {{ relatorio.status }}
+                        {% else %}
+                            <span class="text-muted">Todos</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div style="background: #dcfce7; padding: 14px; border-radius: 8px; border-left: 4px solid #16a34a;">
+                    <small style="color: #15803d; font-weight: 600;">COMARCA</small>
+                    <div style="margin-top: 6px; font-size: 15px; font-weight: 500;">
+                        {% if relatorio.comarca %}
+                            {{ relatorio.comarca }}
+                        {% else %}
+                            <span class="text-muted">Todas</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div style="background: #fef9c3; padding: 14px; border-radius: 8px; border-left: 4px solid #f59e0b;">
+                    <small style="color: #a16207; font-weight: 600;">TIPO DE USUCAPIÃO</small>
+                    <div style="margin-top: 6px; font-size: 15px; font-weight: 500;">
+                        {% if relatorio.tipo_usucapiao %}
+                            {{ relatorio.tipo_usucapiao }}
+                        {% else %}
+                            <span class="text-muted">Todos</span>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <div class="col-lg-3 col-md-6">
+                <div style="background: #fee2e2; padding: 14px; border-radius: 8px; border-left: 4px solid #dc2626;">
+                    <small style="color: #991b1b; font-weight: 600;">RESULTADOS</small>
+                    <div style="margin-top: 6px; font-size: 15px; font-weight: 500; color: #dc2626;">
+                        {{ total_processos }} processo{{ 's' if total_processos != 1 else '' }}
+                    </div>
+                </div>
+            </div>
+
+        </div>
+
+    </div>
+
+    <div class="row g-4">
+
+        <!-- COLUNA PRINCIPAL -->
+        <div class="col-lg-8">
+    <div class="dashboard-grid" style="margin-bottom: 24px;">
+
+        <div class="card-kpi blue">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4>Processos Totais</h4>
+                    <h2>{{ total_processos }}</h2>
+                </div>
+                <i class="fas fa-file" style="font-size: 32px; opacity: 0.2;"></i>
+            </div>
+        </div>
+
+        <div class="card-kpi green">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4>Em Tramitação</h4>
+                    <h2>{{ total_andamento }}</h2>
+                </div>
+                <i class="fas fa-hourglass-half" style="font-size: 32px; opacity: 0.2;"></i>
+            </div>
+            <small class="text-muted">{% if total_processos > 0 %}{{ (total_andamento * 100 / total_processos) | int }}%{% else %}0%{% endif %} do total</small>
+        </div>
+
+        <div class="card-kpi orange">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4>Julgados</h4>
+                    <h2>{{ total_julgados }}</h2>
+                </div>
+                <i class="fas fa-gavel" style="font-size: 32px; opacity: 0.2;"></i>
+            </div>
+            <small class="text-muted">{% if total_processos > 0 %}{{ (total_julgados * 100 / total_processos) | int }}%{% else %}0%{% endif %} do total</small>
+        </div>
+
+        <div class="card-kpi red">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h4>Arquivados</h4>
+                    <h2>{{ total_arquivados }}</h2>
+                </div>
+                <i class="fas fa-archive" style="font-size: 32px; opacity: 0.2;"></i>
+            </div>
+            <small class="text-muted">{% if total_processos > 0 %}{{ (total_arquivados * 100 / total_processos) | int }}%{% else %}0%{% endif %} do total</small>
+        </div>
+
+    </div>
+
+    <!-- ANÁLISE POR STATUS -->
+    {% if processos %}
+    <div class="card-box mb-4">
+
+        <h4 class="mb-3" style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-chart-pie" style="color: #1e3c72;"></i> Distribuição por Status
+        </h4>
+
+        <div class="row g-3">
+
+            {% set status_count = {} %}
+            {% for p in processos %}
+                {% if p.status not in status_count %}
+                    {% set _ = status_count.update({p.status: 0}) %}
+                {% endif %}
+                {% set _ = status_count.update({p.status: status_count[p.status] + 1}) %}
+            {% endfor %}
+
+            {% for status, count in status_count.items() %}
+                {% set pct = (count * 100 / total_processos) | int if total_processos > 0 else 0 %}
+                {% set bar_color = '#16a34a' if status == 'Julgado' else ('#dc2626' if status == 'Arquivado' else ('#3498db' if status == 'Em tramitação' else '#9ca3af')) %}
+
+                <div class="col-lg-6">
+                    <div style="display: flex; align-items: center; gap: 12px;">
+
+                        {% if status == 'Julgado' %}
+                            <div style="width: 60px; height: 60px; background: #dcfce7; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                ✓
+                            </div>
+                        {% elif status == 'Arquivado' %}
+                            <div style="width: 60px; height: 60px; background: #fee2e2; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px; color: #dc2626;">
+                                📦
+                            </div>
+                        {% elif status == 'Em tramitação' %}
+                            <div style="width: 60px; height: 60px; background: #dbeafe; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 24px;">
+                                ⏳
+                            </div>
+                        {% else %}
+                            <div style="width: 60px; height: 60px; background: #f3f4f6; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 20px;">
+                                •••
+                            </div>
+                        {% endif %}
+
+                        <div style="flex: 1;">
+                            <div style="font-weight: 600; font-size: 14px;">{{ status }}</div>
+                            <div style="font-size: 24px; font-weight: 700; color: #1e3c72;">{{ count }}</div>
+                            <div class="text-muted" style="font-size: 12px;">{% if total_processos > 0 %}{{ (count * 100 / total_processos) | int }}%{% else %}0%{% endif %} do total</div>
+                        </div>
+
+                        <div style="width: 100%; background: #f3f4f6; height: 6px; border-radius: 3px; overflow: hidden;">
+                            <div class="bar-fill" data-pct="{{ pct }}" data-bg="{{ bar_color }}" style="height:100%;"></div>
+                        </div>
+
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- ANÁLISE POR COMARCA -->
+    {% if processos %}
+    <div class="card-box mb-4">
+
+        <h4 class="mb-3" style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-map-pin" style="color: #1e3c72;"></i> Distribuição por Comarca
+        </h4>
+
+        <div class="row g-3">
+
+            {% set comarca_count = {} %}
+            {% for p in processos %}
+                {% if p.comarca not in comarca_count %}
+                    {% set _ = comarca_count.update({p.comarca: 0}) %}
+                {% endif %}
+                {% set _ = comarca_count.update({p.comarca: comarca_count[p.comarca] + 1}) %}
+            {% endfor %}
+
+            {% for comarca, count in comarca_count|dictsort(reverse=True, attribute=1)|list %}
+                {% set pct = (count * 100 / total_processos) | int if total_processos > 0 else 0 %}
+
+                <div class="col-lg-6 col-md-12">
+                    <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #1e3c72;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <strong style="color: #1e3c72;">{{ comarca }}</strong>
+                            <span class="badge badge-info" style="font-size: 12px;">{{ count }}</span>
+                        </div>
+                        <div style="width: 100%; background: #e2e8f0; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div class="bar-fill" data-pct="{{ pct }}" data-bg="linear-gradient(90deg, #1e3c72, #2a5298)" style="height:100%;"></div>
+                        </div>
+                        <small class="text-muted" style="display: block; margin-top: 4px;">{% if total_processos > 0 %}{{ (count * 100 / total_processos) | int }}%{% else %}0%{% endif %} do total</small>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- ANÁLISE POR TIPO DE USUCAPIÃO -->
+    {% if processos %}
+    <div class="card-box mb-4">
+
+        <h4 class="mb-3" style="display: flex; align-items: center; gap: 8px;">
+            <i class="fas fa-layer-group" style="color: #1e3c72;"></i> Distribuição por Tipo de Usucapião
+        </h4>
+
+        <div class="row g-3">
+
+            {% set tipo_count = {} %}
+            {% for p in processos %}
+                {% if p.tipo_usucapiao not in tipo_count %}
+                    {% set _ = tipo_count.update({p.tipo_usucapiao: 0}) %}
+                {% endif %}
+                {% set _ = tipo_count.update({p.tipo_usucapiao: tipo_count[p.tipo_usucapiao] + 1}) %}
+            {% endfor %}
+
+            {% for tipo, count in tipo_count|dictsort(reverse=True, attribute=1)|list %}
+                {% set pct = (count * 100 / total_processos) | int if total_processos > 0 else 0 %}
+
+                <div class="col-lg-6 col-md-12">
+                    <div style="padding: 12px; background: #f8f9fa; border-radius: 8px; border-left: 4px solid #f39c12;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 6px;">
+                            <strong style="color: #a16207;">{{ tipo }}</strong>
+                            <span class="badge badge-warning" style="font-size: 12px;">{{ count }}</span>
+                        </div>
+                        <div style="width: 100%; background: #fef3c7; height: 8px; border-radius: 4px; overflow: hidden;">
+                            <div class="bar-fill" data-pct="{{ pct }}" data-bg="#f59e0b" style="height:100%;"></div>
+                        </div>
+                        <small class="text-muted" style="display: block; margin-top: 4px;">{% if total_processos > 0 %}{{ (count * 100 / total_processos) | int }}%{% else %}0%{% endif %} do total</small>
+                    </div>
+                </div>
+
+            {% endfor %}
+
+        </div>
+
+    </div>
+    {% endif %}
+
+    <!-- TABELA DE PROCESSOS -->
+    <div class="card-box">
+
+        <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: 20px; flex-wrap: wrap; gap: 12px;">
+
+            <h4 style="margin: 0; display: flex; align-items: center; gap: 8px;">
+                <i class="fas fa-list" style="color: #1e3c72;"></i> Processos Encontrados
+                <span class="badge badge-info" style="font-size: 12px;">{{ total_processos }}</span>
+            </h4>
+
+            <div style="display: flex; gap: 8px;">
+                <button class="btn btn-sm btn-outline-secondary" onclick="window.print()" title="Imprimir">
+                    <i class="fas fa-print"></i>
+                </button>
+            </div>
+
+        </div>
+
+        {% if processos %}
+
+            <div class="table-responsive">
+
+                <table class="table table-hover align-middle">
+
+                    <thead style="background: #f8f9fa;">
+                        <tr>
+                            <th style="width: 12%;">
+                                <i class="fas fa-file-contract"></i> Número
+                            </th>
+                            <th style="width: 14%;">
+                                <i class="fas fa-user"></i> Autor
+                            </th>
+                            <th style="width: 14%;">
+                                <i class="fas fa-user-tie"></i> Réu
+                            </th>
+                            <th style="width: 10%;">
+                                <i class="fas fa-map-marker-alt"></i> Comarca
+                            </th>
+                            <th style="width: 12%;">
+                                <i class="fas fa-tag"></i> Tipo
+                            </th>
+                            <th style="width: 10%;">
+                                <i class="fas fa-check-circle"></i> Status
+                            </th>
+                            <th style="width: 12%;">
+                                <i class="fas fa-calendar"></i> Cadastro
+                            </th>
+                            <th style="width: 8%; text-align: center;">Ações</th>
+                        </tr>
+                    </thead>
+
+                    <tbody>
+
+                        {% for p in processos %}
+
+                        <tr style="transition: background 0.15s;">
+
+                            <td>
+                                <strong style="color: #1e3c72;">{{ p.numero }}</strong>
+                            </td>
+
+                            <td>
+                                <small>{{ p.autor }}</small>
+                            </td>
+
+                            <td>
+                                <small>{{ p.reu }}</small>
+                            </td>
+
+                            <td>
+                                <span class="badge badge-secondary" style="background: #e2e8f0; color: #1a2233; font-size: 11px;">
+                                    {{ p.comarca }}
+                                </span>
+                            </td>
+
+                            <td>
+                                <small class="text-muted">{{ p.tipo_usucapiao }}</small>
+                            </td>
+
+                            <td>
+                                {% if p.status == 'Julgado' %}
+                                    <span class="badge badge-success">
+                                        <i class="fas fa-check"></i> {{ p.status }}
+                                    </span>
+                                {% elif p.status == 'Arquivado' %}
+                                    <span class="badge badge-danger">
+                                        <i class="fas fa-archive"></i> {{ p.status }}
+                                    </span>
+                                {% elif p.status == 'Em tramitação' %}
+                                    <span class="badge badge-info">
+                                        <i class="fas fa-spinner"></i> {{ p.status }}
+                                    </span>
+                                {% else %}
+                                    <span class="badge badge-secondary">
+                                        {{ p.status }}
+                                    </span>
+                                {% endif %}
+                            </td>
+
+                            <td>
+                                <small class="text-muted">{{ p.data_cadastro }}</small>
+                            </td>
+
+                            <td style="text-align: center;">
+                                <div class="action-buttons" style="justify-content: center;">
+                                    <button data-id="{{ p.id }}" class="btn btn-sm btn-info view-processo" title="Visualizar" type="button">
+                                        <i class="fas fa-eye"></i>
+                                    </button>
+                                    <a href="/processo/editar/{{ p.id }}" class="btn btn-sm btn-warning" title="Editar">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                </div>
+                            </td>
+
+                        </tr>
+
+                        {% endfor %}
+
+                    </tbody>
+
+                </table>
+
+            </div>
+
+        {% else %}
+
+            <div style="text-align: center; padding: 48px 20px;">
+                <i class="fas fa-inbox" style="font-size: 48px; color: #cbd5e1; margin-bottom: 12px; display: block;"></i>
+                <h5 style="color: #718096; margin-bottom: 8px;">Nenhum processo encontrado</h5>
+                <p class="text-muted">Nenhum processo corresponde aos filtros aplicados neste relatório.</p>
+                <a href="/relatorio/editar/{{ relatorio.id }}" class="btn btn-sm btn-primary mt-3">
+                    <i class="fas fa-edit"></i> Ajustar Filtros
+                </a>
+            </div>
+
+        {% endif %}
+
+    </div>
+
+        </div>
+
+        <!-- COLUNA LATERAL -->
+        <div class="col-lg-4">
+
+            <!-- INFO DO RELATÓRIO -->
+            <div class="card-box mb-4">
+
+                <h5 class="mb-3" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-info-circle"></i> Informações
+                </h5>
+
+                <div style="display: flex; flex-direction: column; gap: 12px;">
+
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; border-left: 4px solid #1e3c72;">
+                        <small style="color: #718096; font-weight: 600;">CRIADO POR</small>
+                        <h6 style="margin: 4px 0 0 0; color: #1e3c72;">{{ relatorio.usuario_nome }}</h6>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; border-left: 4px solid #16a34a;">
+                        <small style="color: #718096; font-weight: 600;">DATA DE CRIAÇÃO</small>
+                        <h6 style="margin: 4px 0 0 0; color: #15803d;">{{ relatorio.data_criacao }}</h6>
+                    </div>
+
+                    <div style="background: #f8f9fa; padding: 12px; border-radius: 8px; border-left: 4px solid #f39c12;">
+                        <small style="color: #718096; font-weight: 600;">ÚLTIMA ATUALIZAÇÃO</small>
+                        <h6 style="margin: 4px 0 0 0; color: #a16207;">{{ relatorio.data_atualizacao }}</h6>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <!-- RESUMO -->
+            <div class="card-box mb-4" style="text-align: center; background: linear-gradient(135deg, #dbeafe 0%, #f0f9ff 100%); border-left: 4px solid #1e3c72;">
+
+                <h6 style="color: #1e3c72; margin-bottom: 8px;">TOTAL DE PROCESSOS</h6>
+
+                <h2 style="color: #1e3c72; margin: 8px 0; font-weight: 700;">{{ total_processos }}</h2>
+
+                <small class="text-muted">Encontrado{{ 's' if total_processos != 1 else '' }} neste relatório</small>
+
+            </div>
+
+            <!-- AÇÕES RÁPIDAS -->
+            <div class="card-box">
+
+                <h5 class="mb-3" style="display: flex; align-items: center; gap: 8px;">
+                    <i class="fas fa-bolt"></i> Ações
+                </h5>
+
+                <div style="display: flex; flex-direction: column; gap: 8px;">
+
+                    <a href="/relatorio/editar/{{ relatorio.id }}" class="btn btn-primary" style="width: 100%;">
+                        <i class="fas fa-pen"></i> Editar Filtros
+                    </a>
+
+                    <button class="btn btn-secondary" style="width: 100%;" onclick="window.print()">
+                        <i class="fas fa-print"></i> Imprimir
+                    </button>
+
+                </div>
+
+            </div>
+
+        </div>
+
+    </div>
+
+    <!-- FOOTER INFO -->
+    <!-- MODAL PARA VISUALIZAR PROCESSO (conteúdo carregado via AJAX) -->
+    <div id="processoModal" class="modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center;">
+        <div style="background:white; border-radius:10px; max-width:860px; width:95%; max-height:86vh; overflow:auto;">
+            <div style="display:flex; justify-content:space-between; align-items:center; padding:12px 16px; border-bottom:1px solid #eee;">
+                <strong>Detalhes do Processo</strong>
+                <button id="closeModal" class="btn btn-sm btn-outline-secondary">Fechar</button>
+            </div>
+            <div id="processoModalBody">Carregando...</div>
+        </div>
+    </div>
+
+    <script>
+    document.addEventListener('click', function(e){
+        var btn = e.target.closest('.view-processo');
+        if(btn){
+            const id = btn.getAttribute('data-id');
+            const body = document.getElementById('processoModalBody');
+            const modal = document.getElementById('processoModal');
+            body.innerHTML = 'Carregando...';
+            modal.style.display = 'flex';
+            fetch('/processo/modal/' + id)
+                .then(r => r.text())
+                .then(html => { body.innerHTML = html; })
+                .catch(()=> { body.innerHTML = '<div style="padding:16px">Erro ao carregar processo.</div>'; });
+        }
+        if(e.target.id === 'closeModal'){
+            document.getElementById('processoModal').style.display = 'none';
+        }
+    });
+    // fecha modal ao clicar fora
+    (function(){
+        var modal = document.getElementById('processoModal');
+        if(modal) modal.addEventListener('click', function(e){ if(e.target === this) this.style.display = 'none'; });
+    })();
+    // Aplica larguras e cores de barras calculadas via data-attributes
+    document.addEventListener('DOMContentLoaded', function(){
+        document.querySelectorAll('.bar-fill').forEach(function(el){
+            var pct = el.getAttribute('data-pct') || '0';
+            var bg = el.getAttribute('data-bg') || '#e2e8f0';
+            el.style.width = pct + '%';
+            el.style.background = bg;
+        });
+    });
+    </script>
+    <div style="margin-top: 24px; padding: 16px; background: #f8f9fa; border-radius: 8px; text-align: center; color: #718096; font-size: 12px;">
+        <i class="fas fa-info-circle"></i> Relatório {{ relatorio.nome }} | Gerado em {{ relatorio.data_atualizacao }} | 
+        {% if relatorio.tipo_usucapiao or relatorio.comarca or relatorio.status %}
+            <i class="fas fa-filter"></i> Com filtros aplicados
+        {% else %}
+            <i class="fas fa-globe"></i> Sem filtros (todos os processos)
+        {% endif %}
+    </div>
+
+</div>
+
+{% endblock %}

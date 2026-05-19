@@ -1,0 +1,314 @@
+{% extends 'base.html' %}
+
+{% block title %}Relatórios - Sistema TJ{% endblock %}
+
+{% block content %}
+
+<div class="page-header">
+
+    <div>
+
+        <h2>
+            <i class="fas fa-chart-column"></i>
+            Relatórios Gerenciais
+        </h2>
+
+        <p class="text-muted">
+            Análise completa dos processos do sistema
+        </p>
+
+    </div>
+
+</div>
+
+<!-- =========================================================
+FILTROS
+========================================================= -->
+<div class="card-box mb-4">
+
+    <form method="GET" action="{{ url_for('relatorios') }}">
+
+        <div class="row g-3">
+
+            <div class="col-lg-3">
+                <label class="form-label">Número</label>
+                <input type="text" name="numero" class="form-control"
+                       value="{{ request.args.get('numero', '') }}"
+                       placeholder="Pesquisar número">
+            </div>
+
+            <div class="col-lg-3">
+                <label class="form-label">Autor</label>
+                <input type="text" name="autor" class="form-control"
+                       value="{{ request.args.get('autor', '') }}"
+                       placeholder="Nome do autor">
+            </div>
+
+            <div class="col-lg-3">
+                <label class="form-label">Status</label>
+                <select name="status" class="form-select">
+
+                    <option value="">Todos</option>
+
+                    <option value="Em tramitação"
+                        {% if request.args.get('status') == 'Em tramitação' %}selected{% endif %}>
+                        Em tramitação
+                    </option>
+
+                    <option value="Julgado"
+                        {% if request.args.get('status') == 'Julgado' %}selected{% endif %}>
+                        Julgado
+                    </option>
+
+                    <option value="Arquivado"
+                        {% if request.args.get('status') == 'Arquivado' %}selected{% endif %}>
+                        Arquivado
+                    </option>
+
+                </select>
+            </div>
+
+            <div class="col-lg-3">
+                <label class="form-label">Tipo</label>
+                <select name="tipo_usucapiao" class="form-select">
+
+                    <option value="">Todos</option>
+                    <option value="Extraordinária">Extraordinária</option>
+                    <option value="Ordinária">Ordinária</option>
+                    <option value="Especial Urbana">Especial Urbana</option>
+                    <option value="Especial Rural">Especial Rural</option>
+                    <option value="Familiar">Familiar</option>
+                    <option value="Coletiva">Coletiva</option>
+                    <option value="Indígena">Indígena</option>
+                    
+
+                </select>
+            </div>
+
+            <div class="col-lg-12 d-flex justify-content-end">
+                <button class="btn btn-primary">
+                    <i class="fas fa-search"></i>
+                    Filtrar
+                </button>
+            </div>
+
+        </div>
+
+    </form>
+
+</div>
+
+<!-- =========================================================
+KPIs
+========================================================= -->
+<div class="row g-4 mb-4">
+
+    <div class="col-lg-3">
+        <div class="card-kpi">
+            <span>Total</span>
+            <h2>{{ total_processos }}</h2>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="card-kpi blue">
+            <span>Em Tramitação</span>
+            <h2>{{ total_andamento }}</h2>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="card-kpi green">
+            <span>Julgados</span>
+            <h2>{{ total_julgados }}</h2>
+        </div>
+    </div>
+
+    <div class="col-lg-3">
+        <div class="card-kpi red">
+            <span>Arquivados</span>
+            <h2>{{ total_arquivados }}</h2>
+        </div>
+    </div>
+
+</div>
+
+<!-- =========================================================
+TABELA
+========================================================= -->
+<div class="card-box mb-4">
+
+    <div class="d-flex justify-content-between align-items-center mb-3">
+
+        <div>
+            <h5>Relatório de Processos</h5>
+            <small class="text-muted">Resultados filtrados</small>
+        </div>
+
+        <div class="d-flex gap-2">
+
+            <!-- CORRIGIDO: endpoint correto -->
+            <a href="{{ url_for('relatorio_pdf') }}"
+               class="btn btn-danger"
+               target="_blank">
+
+                <i class="fas fa-file-pdf"></i>
+                PDF
+
+            </a>
+
+            <button onclick="window.print()" class="btn btn-dark">
+                <i class="fas fa-print"></i>
+                Imprimir
+            </button>
+
+        </div>
+
+    </div>
+
+    <div class="table-responsive">
+
+    <table class="table table-hover align-middle">
+
+        <thead>
+            <tr>
+                <th>Número</th>
+                <th>Autor</th>
+                <th>Réu</th>
+                <th>Comarca</th>
+                <th>Tipo</th>
+                <th>Status</th>
+                <th>Data</th>
+            </tr>
+        </thead>
+
+        <tbody>
+
+            {% if processos %}
+
+                {% for p in processos %}
+
+                <tr>
+
+                    <td><strong>{{ p.get('numero', '') }}</strong></td>
+                    <td>{{ p.get('autor', '') }}</td>
+
+                    <!-- protegido contra erro de coluna inexistente -->
+                    <td>{{ p.get('reu', '') }}</td>
+
+                    <td>{{ p.get('comarca', '') }}</td>
+
+                    <td>
+                        <span class="badge bg-info">
+                            {{ p.get('tipo_usucapiao', '') }}
+                        </span>
+                    </td>
+
+                    <td>
+
+                        {% if p.get('status', '') == 'Em tramitação' %}
+                            <span class="badge bg-warning text-dark">
+                                {{ p.get('status', '') }}
+                            </span>
+
+                        {% elif p.get('status', '') == 'Julgado' %}
+                            <span class="badge bg-success">
+                                {{ p.get('status', '') }}
+                            </span>
+
+                        {% else %}
+                            <span class="badge bg-danger">
+                                {{ p.get('status', '') }}
+                            </span>
+                        {% endif %}
+
+                    </td>
+
+                    <td>{{ p.get('data_cadastro', '') }}</td>
+
+                </tr>
+
+                {% endfor %}
+
+            {% else %}
+
+                <tr>
+                    <td colspan="7" class="text-center py-4 text-muted">
+                        Nenhum processo encontrado
+                    </td>
+                </tr>
+
+            {% endif %}
+
+        </tbody>
+
+    </table>
+
+</div>
+
+<!-- =========================================================
+GRÁFICOS
+========================================================= -->
+<div class="row g-4">
+
+    <div class="col-lg-6">
+
+        <div class="card-box">
+
+            <h5>Status Processual</h5>
+            <canvas id="graficoStatus"></canvas>
+
+        </div>
+
+    </div>
+
+    <div class="col-lg-6">
+
+        <div class="card-box">
+
+            <h5>Processos por Tipo</h5>
+            <canvas id="graficoTipos"></canvas>
+
+        </div>
+
+    </div>
+
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+
+<script>
+
+const ctx1 = document.getElementById('graficoStatus');
+
+new Chart(ctx1, {
+    type: 'doughnut',
+    data: {
+        labels: ['Em tramitação', 'Julgado', 'Arquivado'],
+        datasets: [{
+            data: [
+                {{ total_andamento }},
+                {{ total_julgados }},
+                {{ total_arquivados }}
+            ]
+        }]
+    }
+});
+
+const ctx2 = document.getElementById('graficoTipos');
+
+new Chart(ctx2, {
+    type: 'bar',
+    data: {
+        labels: {{ tipos_labels | tojson }},
+        datasets: [{
+            label: 'Quantidade',
+            data: {{ tipos_valores | tojson }},
+            borderWidth: 1
+        }]
+    }
+});
+
+</script>
+
+{% endblock %}
