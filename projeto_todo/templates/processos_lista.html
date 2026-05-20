@@ -198,20 +198,21 @@
                                     <i class="fa fa-eye"></i>
 
                                 </a>
-
+                            {% if session.get('perfil') == 'Administrador' %}
                                 <a href="{{ url_for('editar_processo', id=p['id']) }}"
                                    class="btn btn-sm btn-warning">
 
                                     <i class="fa fa-pen"></i>
 
                                 </a>
-
+                            {% endif %}
                                 <a href="{{ url_for('gerar_pdf', id=p['id']) }}"
                                    class="btn btn-sm btn-danger">
 
                                     <i class="fa fa-file-pdf"></i>
 
                                 </a>
+                            {% if session.get('perfil') == 'Administrador' %}
 
                                 <a href="{{ url_for('excluir_processo', id=p['id']) }}"
                                    class="btn btn-sm btn-dark"
@@ -220,7 +221,7 @@
                                     <i class="fa fa-trash"></i>
 
                                 </a>
-
+                            {% endif %}
                             </div>
 
                         </td>

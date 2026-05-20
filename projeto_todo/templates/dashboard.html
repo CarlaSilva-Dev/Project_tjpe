@@ -623,33 +623,22 @@ document.addEventListener("DOMContentLoaded", function () {
     // =====================================================
     // DATATABLE
     // =====================================================
-
+    
     new DataTable('#tabelaDashboard', {
-
-        pageLength: 5,
-
-        ordering: false,
-
-        searching: false,
-
-        info: false,
-
-        lengthChange: false,
-
-        language: {
-
-            paginate: {
-
-                next: "Próximo",
-
-                previous: "Anterior"
-
-            }
-
-        }
-
-    });
-
+    pageLength: 5,
+    language: {
+        search: "Pesquisar:",
+        lengthMenu: "Mostrar _MENU_ registros",
+        info: "Mostrando _START_ até _END_ de _TOTAL_ registros",
+        paginate: {
+            first: "Primeiro",
+            last: "Último",
+            next: "Próximo",
+            previous: "Anterior"
+        },
+        zeroRecords: "Nenhum registro encontrado"
+    }
+});
 });
 
 </script>

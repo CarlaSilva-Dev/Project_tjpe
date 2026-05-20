@@ -204,15 +204,15 @@
                         <td>
 
                             <div class="d-flex gap-2">
-
+                            {% if session.get('perfil') == 'Administrador' %}
                                 <a href="{{ url_for('editar_auditoria', id=l['id']) }}" class="btn btn-sm btn-warning">
 
                                     <i class="fa fa-pen"></i>
-
+                            {% endif %}
                                 </a>
-
+                            {% if session.get('perfil') == 'Administrador' %}
                                 <a href="{{ url_for('excluir_auditoria', id=l['id']) }}" class="btn btn-sm btn-dark" onclick="return confirm('Confirma exclusão?')">
-
+                            {% endif %}
                                     <i class="fa fa-trash"></i>
 
                                 </a>

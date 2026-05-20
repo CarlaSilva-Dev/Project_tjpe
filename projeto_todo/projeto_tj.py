@@ -586,7 +586,6 @@ def dashboard():
         SELECT *
         FROM processos
         ORDER BY id DESC
-        LIMIT 5
         """
     ).fetchall()
 
@@ -788,6 +787,7 @@ def detalhe_processo(id):
 
 @app.route("/processo/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@require_permission(["Administrador"])
 def editar_processo(id):
     conn = get_db_connection()
 
@@ -847,6 +847,7 @@ def editar_processo(id):
 @app.route("/processo/excluir/<int:id>")
 
 @login_required
+@require_permission(["Administrador"])
 
 def excluir_processo(id):
 
@@ -1034,6 +1035,7 @@ def relatorio_pdf():
 # =========================================================
 @app.route("/usuario/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@require_permission(["Administrador"])
 def editar_usuario(id):
 
     conn = get_db_connection()
@@ -1073,6 +1075,7 @@ def editar_usuario(id):
 @app.route("/usuarios")
 
 @login_required
+@require_permission(["Administrador"])
 
 def usuarios():
 
@@ -1090,6 +1093,7 @@ def usuarios():
     )
 @app.route("/usuario/excluir/<int:id>")
 @login_required
+@require_permission(["Administrador"])
 def excluir_usuario(id):
 
     conn = get_db_connection()
@@ -1118,6 +1122,7 @@ def excluir_usuario(id):
 )
 
 @login_required
+@require_permission(["Administrador"])
 
 def novo_usuario():
 
@@ -1136,17 +1141,6 @@ def novo_usuario():
             flash(
                 "Email inválido!",
                 "danger"
-            )
-
-            return redirect(
-                url_for("novo_usuario")
-            )
-
-        if not senha_valida(senha):
-
-            flash(
-                "Senha fraca!",
-                "warning"
             )
 
             return redirect(
@@ -1280,6 +1274,7 @@ def novo_auditoria():
 
 @app.route("/auditoria/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@require_permission(["Administrador"])
 def editar_auditoria(id):
 
     conn = get_db_connection()
@@ -1337,6 +1332,7 @@ def editar_auditoria(id):
 
 @app.route("/auditoria/excluir/<int:id>")
 @login_required
+@require_permission(["Administrador"])
 def excluir_auditoria(id):
 
     conn = get_db_connection()
@@ -1437,6 +1433,7 @@ def novo_relatorio():
 
 @app.route("/relatorio/editar/<int:id>", methods=["GET", "POST"])
 @login_required
+@require_permission(["Administrador"])
 def editar_relatorio(id):
     conn = get_db_connection()
 
@@ -1490,6 +1487,7 @@ def editar_relatorio(id):
 
 @app.route("/relatorio/excluir/<int:id>")
 @login_required
+@require_permission(["Administrador"])
 def excluir_relatorio(id):
     conn = get_db_connection()
 

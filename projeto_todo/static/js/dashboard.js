@@ -96,19 +96,6 @@ document.addEventListener("DOMContentLoaded", function () {
         });
     }
 
-    /* =====================================================
-       FORÇA DE SENHA
-    ====================================================== */
-    const senhaInput = document.querySelector("#senha");
-    if (senhaInput) {
-        senhaInput.addEventListener("keyup", function () {
-            const forte = this.value.length >= 6 &&
-                /\d/.test(this.value) &&
-                /[a-zA-Z]/.test(this.value);
-            this.classList.toggle("input-error",  !forte && this.value.length > 0);
-            this.classList.toggle("input-success",  forte);
-        });
-    }
 
     /* =====================================================
        MÁSCARA CPF

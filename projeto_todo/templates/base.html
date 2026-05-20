@@ -463,6 +463,8 @@
 <script src="https://cdn.datatables.net/1.13.8/js/dataTables.bootstrap5.min.js"></script>
 
 
+
+
 <!-- =========================================================
      DASHBOARD JS
 ========================================================= -->
@@ -470,34 +472,6 @@
 <script src="{{ url_for('static', filename='js/dashboard.js') }}"></script>
 
 
-<!-- =========================================================
-     MENU RESPONSIVO
-========================================================= -->
-
-<script>
-
-document.addEventListener("DOMContentLoaded", function () {
-
-    const menuBtn =
-        document.getElementById("menu-btn");
-
-    const sidebar =
-        document.getElementById("sidebar");
-
-    const main =
-        document.getElementById("main-content");
-
-    menuBtn.addEventListener("click", function () {
-
-        sidebar.classList.toggle("collapsed");
-
-        main.classList.toggle("expanded");
-
-    });
-
-});
-
-</script>
 
 </body>
 

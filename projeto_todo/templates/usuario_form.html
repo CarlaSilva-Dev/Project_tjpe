@@ -153,11 +153,10 @@ document.getElementById('formUsuario').addEventListener('submit', function(e) {
         ok = false;
     }
 
-    if (senha.value.length < 6) {
-        document.getElementById('senhaError').classList.remove('d-none');
-        ok = false;
-    }
-
+    if (senha.value.length > 0 && senha.value.length < 6) {
+    document.getElementById('senhaError').classList.remove('d-none');
+    ok = false;
+}
     if (senha.value !== confirmar.value) {
         document.getElementById('confirmarError').classList.remove('d-none');
         ok = false;
