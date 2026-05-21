@@ -236,7 +236,7 @@
                 {% set _ = comarca_count.update({p.comarca: comarca_count[p.comarca] + 1}) %}
             {% endfor %}
 
-            {% for comarca, count in comarca_count|dictsort(reverse=True, attribute=1)|list %}
+           {% for comarca, count in comarca_count.items()|list|sort(attribute=1, reverse=True) %}
                 {% set pct = (count * 100 / total_processos) | int if total_processos > 0 else 0 %}
 
                 <div class="col-lg-6 col-md-12">
@@ -277,7 +277,7 @@
                 {% set _ = tipo_count.update({p.tipo_usucapiao: tipo_count[p.tipo_usucapiao] + 1}) %}
             {% endfor %}
 
-            {% for tipo, count in tipo_count|dictsort(reverse=True, attribute=1)|list %}
+            {% for tipo, count in tipo_count.items()|list|sort(attribute=1, reverse=True) %}
                 {% set pct = (count * 100 / total_processos) | int if total_processos > 0 else 0 %}
 
                 <div class="col-lg-6 col-md-12">
