@@ -18,12 +18,20 @@ import sqlite3
 import hashlib
 import re
 import io
+import os
 
 from functools import wraps
 from datetime import datetime
+from dotenv import load_dotenv
 
 from reportlab.pdfgen import canvas
 from reportlab.lib.pagesizes import A4
+
+# =========================================================
+# CARREGAMENTO DE VARIÁVEIS DE AMBIENTE
+# =========================================================
+
+load_dotenv()
 
 # =========================================================
 # APP
@@ -31,9 +39,9 @@ from reportlab.lib.pagesizes import A4
 
 app = Flask(__name__)
 
-app.secret_key = "tjpe_secret_key_2026"
+app.secret_key = os.getenv("SECRET_KEY", "tjpe_secret_key_2026_dev")
 
-DATABASE = "database.db"
+DATABASE = os.getenv("DATABASE_PATH", "database.db")
 
 # =========================================================
 # CONEXÃO
