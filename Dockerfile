@@ -5,7 +5,7 @@ FROM python:3.11-slim
 WORKDIR /app
 
 # Copia o arquivo de dependências primeiro (cache de camadas)
-COPY requirements.txt .
+COPY projeto_todo/ .
 
 # Instala as dependências
 RUN pip install --no-cache-dir -r requirements.txt
