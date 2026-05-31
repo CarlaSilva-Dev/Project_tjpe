@@ -1,0 +1,34 @@
+# Ambiente virtual Python
+venv/
+env/
+.venv/
+
+# Cache do Python
+__pycache__/
+*.py[cod]
+*.pyo
+
+# Banco de dados local
+*.db
+*.sqlite3
+
+# Variáveis de ambiente (NUNCA subir para o repositório!)
+.env
+
+# Arquivos de sistema
+.DS_Store
+Thumbs.db
+
+# IDEs
+.vscode/
+.idea/
+*.sublime-project
+*.sublime-workspace
+
+# Logs
+*.log
+
+# Distribuição / build
+dist/
+build/
+*.egg-info/
