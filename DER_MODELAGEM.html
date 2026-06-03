@@ -1,0 +1,1003 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>DER & Modelagem — Sistema TJPE Usucapião</title>
+<style>
+  @import url('https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+  :root {
+    --azul: #003087;
+    --azul-claro: #1a4db8;
+    --dourado: #c8a84b;
+    --bg: #f4f1eb;
+    --cinza: #ddd8cc;
+    --texto: #1a1a1a;
+    --branco: #fff;
+    --verde: #1a6b3c;
+    --vermelho: #8b1a1a;
+    --roxo: #4a1a6b;
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    font-family: 'Syne', sans-serif;
+    background: var(--bg);
+    color: var(--texto);
+    min-height: 100vh;
+  }
+
+  /* ---- HEADER ---- */
+  header {
+    background: var(--azul);
+    color: var(--branco);
+    padding: 28px 40px;
+    display: flex;
+    align-items: center;
+    gap: 20px;
+    border-bottom: 4px solid var(--dourado);
+  }
+  .brasao {
+    width: 54px; height: 54px;
+    background: var(--dourado);
+    border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 24px;
+    font-weight: 800;
+    color: var(--azul);
+    flex-shrink: 0;
+  }
+  header h1 { font-size: 1.5rem; font-weight: 800; letter-spacing: -0.5px; }
+  header p { font-size: 0.82rem; opacity: 0.7; font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+
+  /* ---- TABS ---- */
+  .tabs {
+    display: flex;
+    background: var(--azul);
+    padding: 0 40px;
+  }
+  .tab {
+    padding: 14px 28px;
+    cursor: pointer;
+    font-size: 0.9rem;
+    font-weight: 700;
+    color: rgba(255,255,255,0.55);
+    border-bottom: 3px solid transparent;
+    transition: all 0.2s;
+    letter-spacing: 0.5px;
+  }
+  .tab:hover { color: rgba(255,255,255,0.85); }
+  .tab.active { color: var(--dourado); border-bottom-color: var(--dourado); }
+
+  /* ---- SECTIONS ---- */
+  .section { display: none; padding: 40px; max-width: 1200px; margin: 0 auto; }
+  .section.active { display: block; }
+
+  /* ---- TÍTULOS ---- */
+  .section-title {
+    font-size: 1.6rem;
+    font-weight: 800;
+    color: var(--azul);
+    margin-bottom: 8px;
+    display: flex;
+    align-items: center;
+    gap: 12px;
+  }
+  .section-title::before {
+    content: '';
+    width: 6px; height: 30px;
+    background: var(--dourado);
+    border-radius: 3px;
+  }
+  .section-sub {
+    font-size: 0.85rem;
+    color: #666;
+    margin-bottom: 36px;
+    font-family: 'IBM Plex Mono', monospace;
+    padding-left: 18px;
+  }
+
+  /* ======== DER ======== */
+  .der-container {
+    overflow-x: auto;
+  }
+
+  .der-canvas {
+    position: relative;
+    min-width: 1300px;
+    height: 950px;
+  }
+
+  /* linhas SVG */
+  .der-svg {
+    position: absolute;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    pointer-events: none;
+  }
+
+  /* entidade */
+  .entity {
+    position: absolute;
+    z-index: 10;
+    background: var(--branco);
+    border: 2.5px solid var(--azul);
+    border-radius: 8px;
+    box-shadow: 4px 4px 0 var(--azul);
+    min-width: 180px;
+    font-size: 0.82rem;
+  }
+  .entity-header {
+    background: var(--azul);
+    color: var(--branco);
+    font-weight: 700;
+    font-size: 0.85rem;
+    padding: 8px 14px;
+    border-radius: 5px 5px 0 0;
+    letter-spacing: 0.5px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+  }
+  .entity-icon { font-size: 1rem; }
+  .entity-body { padding: 8px 0; }
+  .field {
+    padding: 5px 14px;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    border-bottom: 1px solid #f0ede5;
+  }
+  .field:last-child { border-bottom: none; }
+  .field-key {
+    font-size: 0.68rem;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    background: var(--dourado);
+    color: var(--azul);
+    padding: 1px 5px;
+    border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .field-fk {
+    background: #e8f0ff;
+    color: var(--azul-claro);
+  }
+  .field-name {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: #444;
+  }
+  .field-type {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.68rem;
+    color: #999;
+    margin-left: auto;
+  }
+
+  /* posições */
+  #ent-status{
+    top:60px;
+    left:110px;
+    width:180px;
+  }
+
+  #ent-usuarios{
+    top:40px;
+    left:520px;
+  }
+
+  #ent-processos{
+   
+    top:300px;
+    left:510px;
+
+  }
+
+  #ent-relatorios{
+    top:300px;
+    left:900px;
+  }
+
+  #ent-comarcas{
+    top:420px;
+    left:110px;
+  }
+
+  #ent-auditoria{
+    top:40px;
+    left:900px;
+  }
+
+  #ent-tipos{
+    top:620px;
+    left:520px;
+  }
+
+  /* ===== CONECTORES ===== */
+
+  .connector{
+    position:absolute;
+    z-index:1;
+  }
+
+  .connector-h{
+    height:3px;
+    background:#003087;
+  }
+
+  .connector-v{
+    width:3px;
+    background:#003087;
+  }
+
+  .connector-dashed{
+    border-top:2px dashed #1a4db8;
+  }
+
+  .connector-purple{
+    border-top:2px dashed #6a1b9a;
+  }
+
+  .connector-gray{
+    border-left:2px dashed #777;
+  }
+
+  .entity{
+    z-index:10;
+  }
+
+
+  /* Legenda cardinality */
+  .rel-label {
+    position: absolute;
+    transform: translate(-50%, -50%);
+    font-size: 0.7rem;
+    font-weight: 700;
+    font-family: 'IBM Plex Mono', monospace;
+    background: #fff3cd;
+    color: #856404;
+    padding: 2px 6px;
+    border-radius: 4px;
+    border: 1px solid #ffc107;
+  }
+  
+  /* ======== MODELAGEM ======== */
+  .model-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 24px;
+    margin-bottom: 32px;
+  }
+
+  .model-card {
+    background: var(--branco);
+    border: 2px solid var(--cinza);
+    border-radius: 10px;
+    overflow: hidden;
+    box-shadow: 3px 3px 0 var(--cinza);
+  }
+  .model-card-header {
+    padding: 14px 20px;
+    font-weight: 700;
+    font-size: 0.92rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    letter-spacing: 0.3px;
+  }
+  .model-card-header .badge {
+    font-size: 0.68rem;
+    font-family: 'IBM Plex Mono', monospace;
+    padding: 2px 8px;
+    border-radius: 20px;
+    margin-left: auto;
+  }
+  .model-card-body { padding: 16px 20px; }
+  .model-card-body p {
+    font-size: 0.83rem;
+    color: #555;
+    line-height: 1.6;
+    margin-bottom: 12px;
+  }
+
+  .color-azul   .model-card-header { background: var(--azul); color: #fff; }
+  .color-verde  .model-card-header { background: var(--verde); color: #fff; }
+  .color-roxo   .model-card-header { background: var(--roxo); color: #fff; }
+  .color-dourado .model-card-header { background: var(--dourado); color: var(--azul); }
+  .color-vermelho .model-card-header { background: var(--vermelho); color: #fff; }
+  .color-cinza  .model-card-header { background: #555; color: #fff; }
+
+  .color-azul   { border-color: var(--azul); box-shadow: 3px 3px 0 var(--azul); }
+  .color-verde  { border-color: var(--verde); box-shadow: 3px 3px 0 var(--verde); }
+  .color-roxo   { border-color: var(--roxo); box-shadow: 3px 3px 0 var(--roxo); }
+  .color-dourado { border-color: var(--dourado); box-shadow: 3px 3px 0 var(--dourado); }
+  .color-vermelho { border-color: var(--vermelho); box-shadow: 3px 3px 0 var(--vermelho); }
+  .color-cinza  { border-color: #555; box-shadow: 3px 3px 0 #555; }
+
+  .badge-adm  { background: rgba(255,255,255,0.2); color: #fff; }
+  .badge-srv  { background: rgba(255,255,255,0.2); color: #fff; }
+
+  /* Fluxo de Caso de Uso */
+  .usecase-flow {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 10px;
+    margin-top: 10px;
+  }
+  .usecase-item {
+    background: #eef2ff;
+    border: 1.5px solid var(--azul-claro);
+    border-radius: 20px;
+    padding: 4px 14px;
+    font-size: 0.78rem;
+    font-weight: 600;
+    color: var(--azul);
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .usecase-item.mag { background: #e8f5e9; border-color: var(--verde); color: var(--verde); }
+  .usecase-item.adm { background: #fdf3e8; border-color: #c77700; color: #7a4800; }
+
+  /* Requisitos */
+  .req-list { list-style: none; }
+  .req-list li {
+    padding: 6px 0;
+    font-size: 0.82rem;
+    color: #444;
+    display: flex;
+    align-items: flex-start;
+    gap: 8px;
+    border-bottom: 1px dashed #e0ddd5;
+  }
+  .req-list li:last-child { border-bottom: none; }
+  .req-num {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.7rem;
+    font-weight: 700;
+    background: var(--azul);
+    color: #fff;
+    padding: 1px 6px;
+    border-radius: 3px;
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  /* Perfis */
+  .perfis-grid {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 12px;
+    margin-top: 10px;
+  }
+  .perfil-box {
+    border: 2px solid var(--cinza);
+    border-radius: 8px;
+    padding: 12px;
+    text-align: center;
+  }
+  .perfil-box h4 { font-size: 0.85rem; font-weight: 700; margin-bottom: 6px; }
+  .perfil-box ul {
+    list-style: none;
+    font-size: 0.73rem;
+    color: #555;
+    line-height: 1.7;
+    font-family: 'IBM Plex Mono', monospace;
+  }
+  .perfil-box.p1 { border-color: var(--vermelho); }
+  .perfil-box.p1 h4 { color: var(--vermelho); }
+  .perfil-box.p2 { border-color: var(--azul); }
+  .perfil-box.p2 h4 { color: var(--azul); }
+  .perfil-box.p3 { border-color: var(--verde); }
+  .perfil-box.p3 h4 { color: var(--verde); }
+
+  /* Full width card */
+  .full-width { grid-column: 1 / -1; }
+
+  /* Arquitetura */
+  .arch-flow {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    overflow-x: auto;
+    padding: 10px 0;
+  }
+  .arch-box {
+    background: #eef2ff;
+    border: 2px solid var(--azul-claro);
+    border-radius: 8px;
+    padding: 12px 18px;
+    text-align: center;
+    min-width: 120px;
+    flex-shrink: 0;
+  }
+  .arch-box .icon { font-size: 1.5rem; margin-bottom: 4px; }
+  .arch-box .label { font-size: 0.75rem; font-weight: 700; color: var(--azul); }
+  .arch-box .tech { font-size: 0.68rem; color: #666; font-family: 'IBM Plex Mono', monospace; margin-top: 2px; }
+  .arch-arrow {
+    font-size: 1.2rem;
+    color: var(--azul-claro);
+    padding: 0 6px;
+    flex-shrink: 0;
+  }
+
+  /* Legenda DER */
+  .der-legend {
+    display: flex;
+    gap: 24px;
+    flex-wrap: wrap;
+    margin-top: 20px;
+    padding: 16px 20px;
+    background: var(--branco);
+    border: 1.5px solid var(--cinza);
+    border-radius: 8px;
+    font-size: 0.78rem;
+  }
+  .legend-item { display: flex; align-items: center; gap: 8px; }
+  .legend-box {
+    width: 22px; height: 14px; border-radius: 3px;
+    flex-shrink: 0;
+  }
+  .lb-pk { background: var(--dourado); }
+  .lb-fk { background: #c8d8ff; border: 1px solid var(--azul-claro); }
+  .lb-attr { background: #f0ede5; border: 1px solid var(--cinza); }
+  .lb-rel { border-top: 2px dashed var(--azul-claro); }
+
+  @media (max-width: 700px) {
+    .model-grid { grid-template-columns: 1fr; }
+    .section { padding: 20px; }
+    header { padding: 20px; }
+    .tabs { padding: 0 20px; }
+    .tab { padding: 12px 14px; font-size: 0.8rem; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brasao">⚖</div>
+  <div>
+    <h1>Sistema TJPE — Usucapião</h1>
+    <p>DER · Modelagem do Sistema · Requisitos · Arquitetura</p>
+  </div>
+</header>
+
+<div class="tabs">
+  <div class="tab active" onclick="showTab('der')">📊 DER</div>
+  <div class="tab" onclick="showTab('modelo')">🗂 Modelagem</div>
+  <div class="tab" onclick="showTab('req')">📋 Requisitos</div>
+</div>
+
+<!-- =================== DER =================== -->
+<div class="section active" id="tab-der">
+  <div class="section-title">Diagrama Entidade-Relacionamento</div>
+  <p class="section-sub">Estrutura completa do banco de dados SQLite do sistema TJPE Usucapião</p>
+
+  <div class="der-container">
+    <div class="der-canvas">
+
+
+<!-- STATUS -> PROCESSOS -->
+<div class="connector connector-purple"
+style="left:290px;top:130px;width:160px;"></div>
+
+<div class="connector connector-gray"
+style="left:450px;top:130px;height:200px;"></div>
+
+<div class="connector connector-purple"
+style="left:450px;top:330px;width:60px;"></div>
+
+<!-- USUARIOS -> PROCESSOS -->
+
+<div class="connector connector-v"
+style="left:610px;top:180px;height:100px;"></div>
+
+<!-- USUARIOS -> RELATORIOS -->
+
+<div class="connector connector-v"
+style="left:690px;top:180px;height:60px;"></div>
+
+<div class="connector connector-h"
+style="left:690px;top:240px;width:300px;"></div>
+
+<div class="connector connector-v"
+style="left:990px;top:240px;height:40px;"></div>
+
+<!-- USUARIOS -> AUDITORIA -->
+
+<div class="connector connector-h"
+style="left:725px;top:170px;width:175px;"></div>
+
+<!-- COMARCAS -> PROCESSOS -->
+
+<div class="connector connector-dashed"
+style="left:320px;top:445px;width:190px;"></div>
+
+
+<!-- PROCESSOS -> TIPOS_USUCAPIAO -->
+
+<div class="connector connector-v"
+style="left:600px;top:560px;height:60px;"></div>
+
+<!-- PROCESSOS -> RELATORIOS -->
+
+<div class="connector connector-dashed"
+style="left:690px;top:445px;width:210px;"></div>
+
+<!-- ========================================= -->
+<!-- CARDINALIDADES -->
+<!-- ========================================= -->
+
+<!-- USUARIOS -> PROCESSOS -->
+<div class="rel-label" style="left:625px;top:235px;">1</div>
+<div class="rel-label" style="left:625px;top:285px;">N</div>
+
+<!-- USUARIOS -> RELATORIOS -->
+<div class="rel-label" style="left:760px;top:255px;">1</div>
+<div class="rel-label" style="left:1010px;top:285px;">N</div>
+
+<!-- USUARIOS -> AUDITORIA -->
+<div class="rel-label" style="left:760px;top:190px;">1</div>
+<div class="rel-label" style="left:890px;top:190px;">N</div>
+
+<!-- COMARCAS -> PROCESSOS -->
+<div class="rel-label" style="left:320px;top:425px;">1</div>
+<div class="rel-label" style="left:500px;top:425px;">N</div>
+
+<!-- STATUS -> PROCESSOS -->
+<div class="rel-label" style="left:300px;top:150px;">1</div>
+<div class="rel-label" style="left:500px;top:350px;">N</div>
+
+<!-- TIPOS_USUCAPIAO -> PROCESSOS -->
+<div class="rel-label" style="left:620px;top:560px;">1</div>
+<div class="rel-label" style="left:620px;top:610px;">N</div>
+
+<!-- PROCESSOS -> RELATORIOS -->
+<div class="rel-label" style="left:700px;top:455px;">N</div>
+<div class="rel-label" style="left:890px;top:455px;">N</div>
+        
+
+      <!-- STATUS -->
+      <div class="entity" id="ent-status">
+        <div class="entity-header"><span class="entity-icon">📌</span> STATUS</div>
+        <div class="entity-body">
+          <div class="field"><span class="field-key">PK</span><span class="field-name">id</span><span class="field-type">INT</span></div>
+          <div class="field"><span class="field-name">nome</span><span class="field-type">TEXT</span></div>
+        </div>
+      </div>
+
+      <!-- USUARIOS -->
+      <div class="entity" id="ent-usuarios">
+        <div class="entity-header"><span class="entity-icon">👤</span> USUARIOS</div>
+        <div class="entity-body">
+          <div class="field"><span class="field-key">PK</span><span class="field-name">id</span><span class="field-type">INT</span></div>
+          <div class="field"><span class="field-name">nome</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">email</span><span class="field-type">TEXT UNIQUE</span></div>
+          <div class="field"><span class="field-name">senha</span><span class="field-type">TEXT (hash)</span></div>
+          <div class="field"><span class="field-name">perfil</span><span class="field-type">TEXT</span></div>
+        </div>
+      </div>
+
+      <!-- PROCESSOS -->
+      <div class="entity" id="ent-processos">
+        <div class="entity-header"><span class="entity-icon">📄</span> PROCESSOS</div>
+        <div class="entity-body">
+          <div class="field"><span class="field-key">PK</span><span class="field-name">id</span><span class="field-type">INT</span></div>
+          <div class="field"><span class="field-name">numero</span><span class="field-type">TEXT UNIQUE</span></div>
+          <div class="field"><span class="field-name">autor</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">reu</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">comarca</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">status</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">tipo_usucapiao</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">observacoes</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">data_cadastro</span><span class="field-type">TEXT</span></div>
+        </div>
+      </div>
+
+      <!-- RELATORIOS -->
+      <div class="entity" id="ent-relatorios">
+        <div class="entity-header"><span class="entity-icon">📊</span> RELATORIOS</div>
+        <div class="entity-body">
+          <div class="field"><span class="field-key">PK</span><span class="field-name">id</span><span class="field-type">INT</span></div>
+          <div class="field"><span class="field-key field-fk">FK</span><span class="field-name">usuario_id</span><span class="field-type">INT</span></div>
+          <div class="field"><span class="field-name">nome</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">descricao</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">status</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">comarca</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">tipo_usucapiao</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">data_criacao</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">data_atualizacao</span><span class="field-type">TEXT</span></div>
+        </div>
+      </div>
+
+      <!-- AUDITORIA -->
+      <div class="entity" id="ent-auditoria">
+        <div class="entity-header" style="background:#4a1a6b;"><span class="entity-icon">🔍</span> AUDITORIA</div>
+        <div class="entity-body">
+          <div class="field"><span class="field-key">PK</span><span class="field-name">id</span><span class="field-type">INT</span></div>
+          <div class="field"><span class="field-name">usuario</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">acao</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">detalhes</span><span class="field-type">TEXT</span></div>
+          <div class="field"><span class="field-name">data_hora</span><span class="field-type">TEXT</span></div>
+        </div>
+      </div>
+
+      <!-- COMARCAS -->
+      <div class="entity" id="ent-comarcas">
+        <div class="entity-header" style="background:#1a6b3c;"><span class="entity-icon">🏛</span> COMARCAS</div>
+        <div class="entity-body">
+          <div class="field"><span class="field-key">PK</span><span class="field-name">id</span><span class="field-type">INT</span></div>
+          <div class="field"><span class="field-name">nome</span><span class="field-type">TEXT UNIQUE</span></div>
+        </div>
+      </div>
+
+      <!-- TIPOS -->
+      <div class="entity" id="ent-tipos">
+        <div class="entity-header" style="background:#8b4513;"><span class="entity-icon">📂</span> TIPOS_USUCAPIAO</div>
+        <div class="entity-body">
+          <div class="field"><span class="field-key">PK</span><span class="field-name">id</span><span class="field-type">INT</span></div>
+          <div class="field"><span class="field-name">nome</span><span class="field-type">TEXT UNIQUE</span></div>
+        </div>
+      </div>
+
+    </div><!-- /der-canvas -->
+  </div><!-- /der-container -->
+
+  <!-- LEGENDA -->
+  <div class="der-legend">
+    <strong style="color:#333;font-size:0.8rem;">Legenda:</strong>
+    <div class="legend-item"><div class="legend-box lb-pk"></div> Chave Primária (PK)</div>
+    <div class="legend-item"><div class="legend-box lb-fk"></div> Chave Estrangeira (FK)</div>
+    <div class="legend-item"><div class="legend-box lb-attr"></div> Atributo comum</div>
+    <div class="legend-item" style="font-size:0.78rem;">── Relação com FK explícita</div>
+    <div class="legend-item" style="font-size:0.78rem;">- - Relação por valor (sem FK formal)</div>
+    <div class="legend-item" style="font-size:0.78rem;"><strong>1:N</strong> — Um usuário pode ter muitos relatórios / processos</div>
+  </div>
+
+  <!-- Tabela de Relacionamentos -->
+  <div style="margin-top:32px;">
+    <div class="section-title" style="font-size:1.2rem;">Relacionamentos</div>
+    <div style="margin-top:16px;overflow-x:auto;">
+      <table style="width:100%;border-collapse:collapse;font-size:0.82rem;background:#fff;border-radius:8px;overflow:hidden;box-shadow:2px 2px 0 #ddd;">
+        <thead>
+          <tr style="background:var(--azul);color:#fff;">
+            <th style="padding:10px 14px;text-align:left;">Tabela A</th>
+            <th style="padding:10px 14px;text-align:left;">Cardinalidade</th>
+            <th style="padding:10px 14px;text-align:left;">Tabela B</th>
+            <th style="padding:10px 14px;text-align:left;">Tipo de Ligação</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:9px 14px;font-weight:700;">USUARIOS</td>
+            <td style="padding:9px 14px;font-family:monospace;color:var(--azul-claro);">1 : N</td>
+            <td style="padding:9px 14px;font-weight:700;">RELATORIOS</td>
+            <td style="padding:9px 14px;color:#555;">FK explícita (usuario_id)</td>
+          </tr>
+          <tr style="background:#fafaf7;border-bottom:1px solid #eee;">
+            <td style="padding:9px 14px;font-weight:700;">USUARIOS</td>
+            <td style="padding:9px 14px;font-family:monospace;color:var(--azul-claro);">1 : N</td>
+            <td style="padding:9px 14px;font-weight:700;">PROCESSOS</td>
+            <td style="padding:9px 14px;color:#555;">Relação por valor (campo autor/usuário)</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:9px 14px;font-weight:700;">USUARIOS</td>
+            <td style="padding:9px 14px;font-family:monospace;color:var(--azul-claro);">1 : N</td>
+            <td style="padding:9px 14px;font-weight:700;">AUDITORIA</td>
+            <td style="padding:9px 14px;color:#555;">Relação por valor (campo usuario)</td>
+          </tr>
+          <tr style="background:#fafaf7;border-bottom:1px solid #eee;">
+            <td style="padding:9px 14px;font-weight:700;">COMARCAS</td>
+            <td style="padding:9px 14px;font-family:monospace;color:var(--verde);">1 : N</td>
+            <td style="padding:9px 14px;font-weight:700;">PROCESSOS</td>
+            <td style="padding:9px 14px;color:#555;">Relação por valor (campo comarca)</td>
+          </tr>
+          <tr style="border-bottom:1px solid #eee;">
+            <td style="padding:9px 14px;font-weight:700;">TIPOS_USUCAPIAO</td>
+            <td style="padding:9px 14px;font-family:monospace;color:var(--verde);">1 : N</td>
+            <td style="padding:9px 14px;font-weight:700;">PROCESSOS</td>
+            <td style="padding:9px 14px;color:#555;">Relação por valor (campo tipo_usucapiao)</td>
+          </tr>
+          <tr style="background:#fafaf7;">
+            <td style="padding:9px 14px;font-weight:700;">STATUS_PROCESSO</td>
+            <td style="padding:9px 14px;font-family:monospace;color:var(--verde);">1 : N</td>
+            <td style="padding:9px 14px;font-weight:700;">PROCESSOS</td>
+            <td style="padding:9px 14px;color:#555;">Relação por valor (campo status)</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</div>
+
+<!-- =================== MODELAGEM =================== -->
+<div class="section" id="tab-modelo">
+  <div class="section-title">Modelagem do Sistema</div>
+  <p class="section-sub">Arquitetura, perfis de usuário, casos de uso e fluxos principais</p>
+
+  <div class="model-grid">
+
+    <!-- Arquitetura -->
+    <div class="model-card color-azul full-width">
+      <div class="model-card-header">🏗 Arquitetura do Sistema<span class="badge badge-adm">Web App</span></div>
+      <div class="model-card-body">
+        <div class="arch-flow">
+          <div class="arch-box">
+            <div class="icon">🌐</div>
+            <div class="label">Navegador</div>
+            <div class="tech">HTML/CSS/JS</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box">
+            <div class="icon">🐍</div>
+            <div class="label">Flask</div>
+            <div class="tech">Python / Jinja2</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box">
+            <div class="icon">🗄</div>
+            <div class="label">SQLite</div>
+            <div class="tech">database.db</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box">
+            <div class="icon">📄</div>
+            <div class="label">PDF</div>
+            <div class="tech">WeasyPrint</div>
+          </div>
+          <div class="arch-arrow">→</div>
+          <div class="arch-box">
+            <div class="icon">🐳</div>
+            <div class="label">Docker</div>
+            <div class="tech">Deploy</div>
+          </div>
+        </div>
+        <p style="margin-top:14px;">Sistema web MVC com Flask (Python). O front-end usa templates Jinja2 com HTML/CSS. O banco é SQLite. Geração de PDFs via WeasyPrint. Deploy containerizado com Docker.</p>
+      </div>
+    </div>
+
+    <!-- Perfis -->
+    <div class="model-card color-vermelho full-width">
+      <div class="model-card-header">👥 Perfis de Usuário e Permissões</div>
+      <div class="model-card-body">
+        <div class="perfis-grid">
+          <div class="perfil-box p1">
+            <h4>🔴 Administrador</h4>
+            <ul>
+              <li>CRUD de usuários</li>
+              <li>CRUD de processos</li>
+              <li>CRUD de relatórios</li>
+              <li>Acesso à auditoria</li>
+              <li>Gerenciar sistema</li>
+              <li>Gerar PDFs</li>
+            </ul>
+          </div>
+          <div class="perfil-box p2">
+            <h4>🔵 Servidor</h4>
+            <ul>
+              <li>Cadastrar processos</li>
+              <li>Editar processos</li>
+              <li>Criar relatórios</li>
+              <li>Visualizar dashboard</li>
+              <li>Gerar PDFs</li>
+            </ul>
+          </div>
+          <div class="perfil-box p3">
+            <h4>🟢 Magistrado</h4>
+            <ul>
+              <li>Visualizar processos</li>
+              <li>Visualizar relatórios</li>
+              <li>Dashboard (leitura)</li>
+              <li>Gerar PDFs</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Módulo Processos -->
+    <div class="model-card color-azul">
+      <div class="model-card-header">📄 Módulo: Processos</div>
+      <div class="model-card-body">
+        <p>Núcleo do sistema. Gerencia todos os processos de Usucapião cadastrados no TJPE.</p>
+        <div class="usecase-flow">
+          <span class="usecase-item">Listar</span>
+          <span class="usecase-item">Criar</span>
+          <span class="usecase-item">Editar</span>
+          <span class="usecase-item">Excluir</span>
+          <span class="usecase-item">Detalhar</span>
+          <span class="usecase-item">Buscar</span>
+          <span class="usecase-item">Filtrar</span>
+          <span class="usecase-item mag">Gerar PDF</span>
+        </div>
+        <p style="margin-top:12px;">Campos: número, autor, réu, comarca, tipo de usucapião, status e observações.</p>
+      </div>
+    </div>
+
+    <!-- Módulo Relatórios -->
+    <div class="model-card color-verde">
+      <div class="model-card-header">📊 Módulo: Relatórios</div>
+      <div class="model-card-body">
+        <p>Criação de relatórios filtrados por comarca, tipo de usucapião e status dos processos.</p>
+        <div class="usecase-flow">
+          <span class="usecase-item mag">Listar</span>
+          <span class="usecase-item mag">Novo</span>
+          <span class="usecase-item mag">Editar</span>
+          <span class="usecase-item mag">Excluir</span>
+          <span class="usecase-item mag">Visualizar</span>
+          <span class="usecase-item mag">Exportar PDF</span>
+        </div>
+        <p style="margin-top:12px;">Vinculado ao usuário criador (FK usuario_id). Permite filtros avançados por período e comarca.</p>
+      </div>
+    </div>
+
+    <!-- Módulo Usuários -->
+    <div class="model-card color-vermelho">
+      <div class="model-card-header">👤 Módulo: Usuários</div>
+      <div class="model-card-body">
+        <p>Gerenciamento dos usuários do sistema com controle de perfis e acesso.</p>
+        <div class="usecase-flow">
+          <span class="usecase-item adm">Listar</span>
+          <span class="usecase-item adm">Criar</span>
+          <span class="usecase-item adm">Editar</span>
+          <span class="usecase-item adm">Excluir</span>
+        </div>
+        <p style="margin-top:12px;">Autenticação com hash SHA-256. Três perfis: Administrador, Servidor, Magistrado. Login com sessão Flask.</p>
+      </div>
+    </div>
+
+    <!-- Módulo Auditoria -->
+    <div class="model-card color-roxo">
+      <div class="model-card-header">🔍 Módulo: Auditoria</div>
+      <div class="model-card-body">
+        <p>Rastreamento de todas as ações realizadas no sistema para fins de segurança e conformidade.</p>
+        <div class="usecase-flow">
+          <span class="usecase-item adm">Visualizar logs</span>
+          <span class="usecase-item adm">Filtrar</span>
+          <span class="usecase-item adm">Registrar ação</span>
+        </div>
+        <p style="margin-top:12px;">Registra automaticamente ações como criação, edição e exclusão de processos e usuários, com data/hora e usuário responsável.</p>
+      </div>
+    </div>
+
+    <!-- Dashboard -->
+    <div class="model-card color-dourado full-width">
+      <div class="model-card-header">📈 Dashboard / Painel Principal</div>
+      <div class="model-card-body">
+        <p>Visão geral do sistema com indicadores de processos por status, comarca e tipo de usucapião. Exibe totais, gráficos e acesso rápido às principais funcionalidades. Acessível para todos os perfis.</p>
+        <div class="usecase-flow" style="margin-top:8px;">
+          <span class="usecase-item">Total de processos</span>
+          <span class="usecase-item">Por comarca</span>
+          <span class="usecase-item">Por tipo</span>
+          <span class="usecase-item">Por status</span>
+          <span class="usecase-item">Processos recentes</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- =================== REQUISITOS =================== -->
+<div class="section" id="tab-req">
+  <div class="section-title">Requisitos do Sistema</div>
+  <p class="section-sub">Levantados a partir do código-fonte do repositório Project_tjpe</p>
+
+  <div class="model-grid">
+
+    <div class="model-card color-azul">
+      <div class="model-card-header">✅ Requisitos Funcionais — Processos</div>
+      <div class="model-card-body">
+        <ul class="req-list">
+          <li><span class="req-num">RF01</span> Cadastrar processo com número, autor, réu, comarca, tipo e status</li>
+          <li><span class="req-num">RF02</span> Listar todos os processos com paginação e busca</li>
+          <li><span class="req-num">RF03</span> Editar dados de um processo existente</li>
+          <li><span class="req-num">RF04</span> Excluir processo (com registro em auditoria)</li>
+          <li><span class="req-num">RF05</span> Visualizar detalhes completos de um processo</li>
+          <li><span class="req-num">RF06</span> Gerar PDF individual de processo</li>
+          <li><span class="req-num">RF07</span> Gerar relatório PDF de todos os processos</li>
+          <li><span class="req-num">RF08</span> Filtrar processos por comarca, status e tipo</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="model-card color-verde">
+      <div class="model-card-header">✅ Requisitos Funcionais — Usuários</div>
+      <div class="model-card-body">
+        <ul class="req-list">
+          <li><span class="req-num">RF09</span> Realizar login com email e senha</li>
+          <li><span class="req-num">RF10</span> Realizar logout encerrando a sessão</li>
+          <li><span class="req-num">RF11</span> Cadastrar novo usuário (apenas Admin)</li>
+          <li><span class="req-num">RF12</span> Editar dados do usuário</li>
+          <li><span class="req-num">RF13</span> Excluir usuário</li>
+          <li><span class="req-num">RF14</span> Atribuir perfil: Administrador, Servidor ou Magistrado</li>
+          <li><span class="req-num">RF15</span> Bloquear acesso a rotas por perfil insuficiente</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="model-card color-roxo">
+      <div class="model-card-header">✅ Requisitos Funcionais — Auditoria e Relatórios</div>
+      <div class="model-card-body">
+        <ul class="req-list">
+          <li><span class="req-num">RF16</span> Registrar automaticamente ações dos usuários</li>
+          <li><span class="req-num">RF17</span> Listar e filtrar logs de auditoria</li>
+          <li><span class="req-num">RF18</span> Criar relatórios personalizados filtrados</li>
+          <li><span class="req-num">RF19</span> Editar e excluir relatórios</li>
+          <li><span class="req-num">RF20</span> Visualizar relatório com dados atualizados</li>
+          <li><span class="req-num">RF21</span> Exportar relatório em PDF</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="model-card color-cinza">
+      <div class="model-card-header">🔒 Requisitos Não-Funcionais</div>
+      <div class="model-card-body">
+        <ul class="req-list">
+          <li><span class="req-num">RNF01</span> Senhas armazenadas com hash SHA-256</li>
+          <li><span class="req-num">RNF02</span> Controle de sessão com Flask-Session</li>
+          <li><span class="req-num">RNF03</span> Validação de email e força de senha</li>
+          <li><span class="req-num">RNF04</span> Sistema deve ser executável via Docker</li>
+          <li><span class="req-num">RNF05</span> Interface responsiva e acessível via navegador</li>
+          <li><span class="req-num">RNF06</span> PDFs gerados com layout institucional TJPE</li>
+          <li><span class="req-num">RNF07</span> Banco de dados SQLite sem dependências externas</li>
+          <li><span class="req-num">RNF08</span> Seed de dados para testes (100 processos)</li>
+        </ul>
+      </div>
+    </div>
+
+    <!-- Tipos de Usucapião -->
+    <div class="model-card color-dourado full-width">
+      <div class="model-card-header">📂 Domínios do Sistema (Tabelas de Referência)</div>
+      <div class="model-card-body">
+        <div style="display:grid;grid-template-columns:1fr 1fr 1fr;gap:20px;flex-wrap:wrap;">
+          <div>
+            <p style="font-weight:700;font-size:0.8rem;margin-bottom:8px;color:var(--azul);">📂 Tipos de Usucapião</p>
+            <ul class="req-list">
+              <li><span class="req-num" style="background:#8b4513;">T</span> Extraordinária</li>
+              <li><span class="req-num" style="background:#8b4513;">T</span> Ordinária</li>
+              <li><span class="req-num" style="background:#8b4513;">T</span> Especial Urbana</li>
+              <li><span class="req-num" style="background:#8b4513;">T</span> Especial Rural</li>
+              <li><span class="req-num" style="background:#8b4513;">T</span> Familiar</li>
+              <li><span class="req-num" style="background:#8b4513;">T</span> Coletiva</li>
+              <li><span class="req-num" style="background:#8b4513;">T</span> Indígena</li>
+            </ul>
+          </div>
+          <div>
+            <p style="font-weight:700;font-size:0.8rem;margin-bottom:8px;color:var(--azul);">📌 Status dos Processos</p>
+            <ul class="req-list">
+              <li><span class="req-num" style="background:var(--verde);">S</span> Em tramitação</li>
+              <li><span class="req-num" style="background:var(--azul);">S</span> Julgado</li>
+              <li><span class="req-num" style="background:#555;">S</span> Arquivado</li>
+              <li><span class="req-num" style="background:var(--vermelho);">S</span> Suspenso</li>
+            </ul>
+          </div>
+          <div>
+            <p style="font-weight:700;font-size:0.8rem;margin-bottom:8px;color:var(--azul);">🏛 Comarcas (PE)</p>
+            <ul class="req-list" style="font-size:0.72rem;">
+              <li><span style="color:#888;font-size:0.7rem;">▪</span> Recife, Olinda, Paulista</li>
+              <li><span style="color:#888;font-size:0.7rem;">▪</span> Jaboatão dos Guararapes</li>
+              <li><span style="color:#888;font-size:0.7rem;">▪</span> Abreu e Lima, Igarassu</li>
+              <li><span style="color:#888;font-size:0.7rem;">▪</span> Camaragibe, Moreno</li>
+              <li><span style="color:#888;font-size:0.7rem;">▪</span> Ipojuca, S. Lourenço da Mata</li>
+              <li><span style="color:#888;font-size:0.7rem;">▪</span> Itamaracá, Araçoiaba, Itapissuma</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+function showTab(name) {
+  document.querySelectorAll('.section').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.getElementById('tab-' + name).classList.add('active');
+  event.target.classList.add('active');
+}
+</script>
+</body>
+</html>
