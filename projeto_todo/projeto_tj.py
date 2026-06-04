@@ -626,11 +626,11 @@ def dashboard():
 
 def processos():
 
-    filtro = request.args.get("filtro", "")
-
+    numero = request.args.get("numero", "")
+    autor = request.args.get("autor", "")
     comarca = request.args.get("comarca", "")
-
     status = request.args.get("status", "")
+    tipo_usucapiao = request.args.get("tipo_usucapiao", "")
 
     conn = get_db_connection()
 
@@ -642,40 +642,29 @@ def processos():
 
     params = []
 
-    if filtro:
+    if numero:
+        query += " AND numero LIKE ? "
+        params.append(f"%{numero}%")
 
-        query += """
-        AND (
-            numero LIKE ?
-            OR autor LIKE ?
-            OR reu LIKE ?
-        )
-        """
+    if autor:
+        query += " AND autor LIKE ? "
+        params.append(f"%{autor}%")
 
-        params.extend([
-            f"%{filtro}%",
-            f"%{filtro}%",
-            f"%{filtro}%"
-        ])
+    if tipo_usucapiao:
+        query += " AND tipo_usucapiao = ? "
+        params.append(tipo_usucapiao)
 
     if comarca:
-
         query += " AND comarca = ? "
-
         params.append(comarca)
 
     if status:
-
         query += " AND status = ? "
-
         params.append(status)
 
     query += " ORDER BY id DESC "
 
-    processos = conn.execute(
-        query,
-        params
-    ).fetchall()
+    processos = conn.execute(query, params).fetchall()
 
     comarcas = conn.execute(
         "SELECT * FROM comarcas"
