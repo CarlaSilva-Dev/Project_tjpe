@@ -85,7 +85,7 @@ SECRET_KEY=sua_chave_secreta_aqui
 |------|--------|
 | Carla Rayanne | [@CarlaSilva-Dev](https://github.com/CarlaSilva-Dev) |
 | Arnaldo Reis | [@Arnaldoreisl](https://github.com/Arnaldoreisl) |
-| Higor Ricardo | [@Hiig0] (https://github.com/hiig0)|
+| Higor Ricardo | [@Hiig0](https://github.com/hiig0) |
 | Gustavo Lopes | [@gustavolopeslima](https://github.com/gustavolopeslima) |
 
 ---
